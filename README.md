@@ -2,12 +2,13 @@
 
 Análise de dados sobre a abstenção no Exame Nacional do Ensino Médio (ENEM), utilizando dados oficiais do INEP entre 2015 e 2025.
 
-Projeto desenvolvido no **MBA em Engenharia de Dados do Instituto Presbiteriano Mackenzie**, nas disciplinas de **Fundamentos de Data Analytics** e **Engenharia de Dados e Big Data**.
+Projeto desenvolvido no **MBA em Engenharia de Dados do Universidade Presbiteriana Mackenzie**, nas disciplinas de **Hands-on**.
 
 ## 👩‍💻 Integrantes
 
 - **Marina Soares de Souza** — RA 10106224
 - **Paola Yêda Aude Gaudiello** — RA 10739716
+- **Saulo Simões Ribeiro Gonçalves** - RA 10738083
 
 ### Professores
 
