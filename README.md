@@ -1,10 +1,10 @@
-# 🎓 ENEM: Quem não foi?
+# ENEM: Quem não foi?
 
 Análise de dados sobre a abstenção no Exame Nacional do Ensino Médio (ENEM), utilizando dados oficiais do INEP entre 2015 e 2025.
 
 Projeto desenvolvido no **MBA em Engenharia de Dados do Universidade Presbiteriana Mackenzie**, nas disciplinas de **Hands-on**.
 
-## 👩‍💻 Integrantes
+## Integrantes
 
 - **Marina Soares de Souza** — RA 10106224
 - **Paola Yêda Aude Gaudiello** — RA 10739716
@@ -16,7 +16,7 @@ Projeto desenvolvido no **MBA em Engenharia de Dados do Universidade Presbiteria
 
 ---
 
-## 📌 Contextualização
+## Contextualização
 
 O Exame Nacional do Ensino Médio (ENEM) é uma das principais avaliações educacionais do Brasil e possui um papel importante no acesso ao ensino superior.
 
@@ -28,25 +28,62 @@ Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto
 
 ---
 
-## 🚨 O problema
+## O problema
 
-**Milhões de pessoas se inscrevem para fazer o ENEM, mas uma parcela delas não aparece no dia da prova.**
+Todos os anos, milhões de pessoas se inscrevem no ENEM porque enxergam na prova uma possibilidade de mudança de vida. Para muitos estudantes, o exame não é apenas uma avaliação: ele pode ser a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
 
-Para muitos estudantes, o ENEM representa uma oportunidade de ingresso no ensino superior e pode ser um passo importante para sua trajetória acadêmica e profissional. Quando esse estudante se inscreve, mas não comparece, essa oportunidade é perdida — seja por questões financeiras, sociais, logísticas, pessoais ou por outros fatores.
+Mas uma parte dessas pessoas se inscreve e, por algum motivo, não chega a fazer a prova.
 
-O problema é que, sem compreender **quem são essas pessoas e o que pode estar relacionado à sua ausência**, torna-se difícil pensar em ações capazes de evitar que isso aconteça.
+E o que acontece depois?
 
-A proposta é investigar os dados para encontrar padrões e perfis associados à ausência e, a partir dessas descobertas, **propor práticas e estratégias que possam ajudar a reduzir a abstenção nas próximas edições do ENEM.**
+Quando uma pessoa deixa de comparecer ao ENEM, não sabemos apenas que ela faltou a uma prova. Pode existir uma história por trás dessa ausência. Pode ser uma dificuldade financeira, uma questão relacionada ao local onde vive, às condições sociais, ao seu perfil demográfico, à situação da sua inscrição ou a alguma outra característica que ainda não conseguimos enxergar claramente nos dados.
+
+E existe uma preocupação ainda maior: **será que essa ausência termina no dia da prova ou pode representar o abandono de um projeto de vida?**
+
+Para alguns estudantes, perder uma edição do ENEM pode significar apenas tentar novamente no ano seguinte. Para outros, porém, pode significar adiar ou até desistir da ideia de cursar uma faculdade. Uma ausência que, olhando apenas para uma tabela, parece ser simplesmente um candidato que não compareceu, pode representar o fim de uma trajetória educacional que nem chegou a começar.
+
+É justamente essa dimensão que torna o problema relevante.
+
+O ENEM pode ser o início da carreira e de uma nova etapa na vida de muitas pessoas. Mas, para algumas delas, a ausência pode representar também o início de um afastamento dos estudos e, consequentemente, de oportunidades futuras.
+
+Hoje sabemos quantas pessoas se inscrevem e quantas não comparecem, mas ainda precisamos entender **quem são essas pessoas**.
+
+Será que existe um perfil de candidato mais propenso a não comparecer? A ausência está relacionada a questões financeiras? Existem diferenças entre gêneros, faixas etárias ou perfis socioeconômicos? Há regiões onde esse problema é mais frequente? A situação da inscrição ou do pagamento tem alguma relação com o comparecimento? Esses padrões se repetem ao longo dos anos ou mudam de acordo com cada edição?
+
+Essas são algumas das perguntas que surgem quando deixamos de olhar para a abstenção apenas como um número e passamos a enxergá-la como um possível reflexo de desigualdades e dificuldades que atingem diferentes grupos de estudantes.
+
+O grande problema, portanto, não é simplesmente **“quantas pessoas faltaram ao ENEM?”**.
+
+É entender **quem são essas pessoas, o que existe em comum entre elas e se estamos diante de grupos que ainda não conseguimos identificar claramente**.
+
+Por isso, este projeto parte da seguinte questão central:
+
+> **Quem são os estudantes que se inscrevem no ENEM, mas não comparecem à prova, e quais características podem estar relacionadas a essa ausência?**
+
+A partir dessa questão, a análise buscará responder:
+
+* Quem são os candidatos que mais deixam de comparecer ao ENEM?
+* Existe um perfil predominante entre os ausentes?
+* A situação financeira ou a condição de pagamento da inscrição está relacionada à ausência?
+* Existem diferenças de abstenção entre gêneros?
+* A idade influencia o comparecimento?
+* O perfil socioeconômico está relacionado à decisão de comparecer ou não?
+* Existem regiões ou grupos específicos em que a ausência é maior?
+* A situação da inscrição apresenta diferenças entre quem comparece e quem não comparece?
+* Esses padrões permanecem ao longo dos anos ou mudam de uma edição para outra?
+* Existem grupos que apresentam taxas de ausência consistentemente maiores?
+* E, principalmente, **estamos conseguindo enxergar nos dados algum grupo de estudantes que pode estar encontrando maiores dificuldades para chegar até o ENEM?**
+
 
 ---
 
-## 🎯 Objetivo
+## Objetivo
 
 Analisar os dados do ENEM entre **2015 e 2025** para identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
 
 ---
 
-## 📊 Dados
+## Dados
 
 Serão utilizadas bases de dados públicas e oficiais disponibilizadas pelo **INEP**, referentes às edições do ENEM de **2015 a 2025**.
 
@@ -64,7 +101,7 @@ Entre os dados de interesse estão:
 
 ---
 
-## 📚 Fonte dos dados
+## Fonte dos dados
 
 **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**
 
