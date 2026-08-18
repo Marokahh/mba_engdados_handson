@@ -8,7 +8,6 @@ Projeto desenvolvido no **MBA em Engenharia de Dados do Universidade Presbiteria
 
 - **Marina Soares de Souza** — RA 10106224
 - **Paola Yêda Aude Gaudiello** — RA 10739716
-- **Saulo Simões Ribeiro Gonçalves** - RA 10738083
 
 ### Professores
 
