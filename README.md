@@ -14,8 +14,6 @@ Projeto desenvolvido no **MBA em Engenharia de Dados do Universidade Presbiteria
 - Fabio Versolatto
 - Gustavo Calixo
 
----
-
 ## Contextualização
 
 O Exame Nacional do Ensino Médio (ENEM) é uma das principais avaliações educacionais do Brasil e possui um papel importante no acesso ao ensino superior.
@@ -25,8 +23,6 @@ Todos os anos, milhões de estudantes realizam sua inscrição para participar d
 Por trás de cada ausência existe um estudante que, por algum motivo, não chegou a realizar o exame. Compreender quem são esses candidatos e quais características estão presentes nesse grupo pode ajudar a entender melhor o fenômeno da abstenção.
 
 Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**, referentes às edições do ENEM entre **2015 e 2025**.
-
----
 
 ## O problema
 
@@ -74,14 +70,9 @@ A partir dessa questão, a análise buscará responder:
 * Existem grupos que apresentam taxas de ausência consistentemente maiores?
 * E, principalmente, **estamos conseguindo enxergar nos dados algum grupo de estudantes que pode estar encontrando maiores dificuldades para chegar até o ENEM?**
 
-
----
-
 ## Objetivo
 
 Analisar os dados do ENEM entre **2015 e 2025** para identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
-
----
 
 ## Dados
 
@@ -98,8 +89,6 @@ Entre os dados de interesse estão:
 - Informações demográficas;
 - Informações geográficas;
 - Outras variáveis relevantes disponibilizadas pelo INEP.
-
----
 
 ## Fonte dos dados
 
