@@ -74,7 +74,7 @@ Identificar padrões e características relacionadas à ausência dos participan
 
 ## Dados
 
-Serão utilizadas bases de dados públicas e oficiais disponibilizadas pelo **INEP**, referentes às edições do ENEM de **2015 a 2025**.
+Serão utilizadas bases de dados públicas e oficiais disponibilizadas pelo **INEP**, referentes às edições do ENEM de **2020 a 2025**.
 
 As variáveis utilizadas serão definidas após a exploração das bases, considerando a disponibilidade e a consistência das informações entre os diferentes anos.
 
