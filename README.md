@@ -1,6 +1,6 @@
 # ENEM: Quem não foi?
 
-Análise de dados sobre a abstenção no Exame Nacional do Ensino Médio (ENEM), utilizando dados oficiais do INEP entre 2015 e 2025.
+Análise de dados sobre a abstenção no Exame Nacional do Ensino Médio (ENEM), utilizando dados oficiais do INEP entre 2020 e 2025.
 
 Projeto desenvolvido no **MBA em Engenharia de Dados do Universidade Presbiteriana Mackenzie**, nas disciplinas de **Hands-on**.
 
@@ -26,11 +26,9 @@ Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto
 
 ## O problema
 
-Todos os anos, milhões de pessoas se inscrevem no ENEM porque enxergam na prova uma possibilidade de mudança de vida. Para muitos estudantes, o exame não é apenas uma avaliação: ele pode ser a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
+Todos os anos, milhões de pessoas se inscrevem no ENEM pois muitos estudantes enxergam o exame não é apenas como uma avaliação, mas como a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
 
-Mas uma parte dessas pessoas se inscreve e, por algum motivo, não chega a fazer a prova.
-
-E o que acontece depois?
+Porém uma parte dessas pessoas se inscreve e, por algum motivo, não chega a fazer a prova. E o que acontece depois?
 
 Quando uma pessoa deixa de comparecer ao ENEM, não sabemos apenas que ela faltou a uma prova. Pode existir uma história por trás dessa ausência. Pode ser uma dificuldade financeira, uma questão relacionada ao local onde vive, às condições sociais, ao seu perfil demográfico, à situação da sua inscrição ou a alguma outra característica que ainda não conseguimos enxergar claramente nos dados.
 
@@ -72,7 +70,7 @@ A partir dessa questão, a análise buscará responder:
 
 ## Objetivo
 
-Analisar os dados do ENEM entre **2015 e 2025** para identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
+Identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
 
 ## Dados
 
