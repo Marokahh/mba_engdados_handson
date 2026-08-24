@@ -1,0 +1,165 @@
+Após rodar a extract.py e todas as tabelas foram carregadas no SQL, onde cada microdados de cada ano ficou em uma tabela separada
+Vamos juntar em uma tabela compilada, rodando o seguinte código: (Como é a primeira vez, vou criar a tabela)
+
+Importante: usamos UNION ALL, e não UNION.
+
+Como cada tabela representa um ano diferente, não queremos que o PostgreSQL tente eliminar registros "duplicados". Queremos simplesmente empilhar os cinco anos.
+
+
+CREATE TABLE dw_enem.microdados_enem_compilado_5_anos AS
+
+SELECT *
+FROM stg_enem.microdados_enem_2019
+
+UNION ALL
+
+SELECT *
+FROM stg_enem.microdados_enem_2020
+
+UNION ALL
+
+SELECT *
+FROM stg_enem.microdados_enem_2021
+
+UNION ALL
+
+SELECT *
+FROM stg_enem.microdados_enem_2022
+
+UNION ALL
+
+SELECT *
+FROM stg_enem.microdados_enem_2023;
+
+
+
+2. Depois confira se criou
+
+Rode:
+
+SELECT COUNT(*) AS total_registros
+FROM dw_enem.microdados_enem_compilado_5_anos;
+
+Pelos números que seu ETL mostrou, esperamos aproximadamente:
+
+5.095.171 + 5.783.109 + 3.389.832 + 3.476.105 + 3.933.955 = 21.678.172 registros
+
+Então o resultado esperado é:
+
+21.678.172
+
+
+
+3. Vamos conferir os anos
+SELECT 
+    "NU_ANO",
+    COUNT(*) AS quantidade
+FROM dw_enem.microdados_enem_compilado_5_anos
+GROUP BY "NU_ANO"
+ORDER BY "NU_ANO";
+
+Deve aparecer algo parecido com:
+
+NU_ANO	quantidade
+2019	5.095.171
+2020	5.783.109
+2021	3.389.832
+2022	3.476.105
+2023	3.933.955
+
+Tempos um csv onde analisamos os dados e decidimos o que seria de grnade valor pros nossos dados
+1. Rode este SQL no DBeaver
+DROP TABLE IF EXISTS dw_enem.microdados_enem_tratado;
+
+CREATE TABLE dw_enem.microdados_enem_tratado AS
+SELECT
+    -- DADOS DO PARTICIPANTE
+    TRIM("NU_INSCRICAO")::VARCHAR(20) AS "NU_INSCRICAO",
+    NULLIF(TRIM("NU_ANO"), '')::INTEGER AS "NU_ANO",
+    NULLIF(TRIM("TP_FAIXA_ETARIA"), '')::INTEGER AS "TP_FAIXA_ETARIA",
+    NULLIF(TRIM("TP_SEXO"), '')::VARCHAR(1) AS "TP_SEXO",
+    NULLIF(TRIM("TP_ESTADO_CIVIL"), '')::INTEGER AS "TP_ESTADO_CIVIL",
+    NULLIF(TRIM("TP_COR_RACA"), '')::INTEGER AS "TP_COR_RACA",
+    NULLIF(TRIM("TP_NACIONALIDADE"), '')::INTEGER AS "TP_NACIONALIDADE",
+    NULLIF(TRIM("TP_ST_CONCLUSAO"), '')::INTEGER AS "TP_ST_CONCLUSAO",
+    NULLIF(TRIM("TP_ANO_CONCLUIU"), '')::INTEGER AS "TP_ANO_CONCLUIU",
+    NULLIF(TRIM("TP_ESCOLA"), '')::INTEGER AS "TP_ESCOLA",
+    NULLIF(TRIM("TP_ENSINO"), '')::INTEGER AS "TP_ENSINO",
+    NULLIF(TRIM("IN_TREINEIRO"), '')::INTEGER AS "IN_TREINEIRO",
+
+    -- DADOS DA ESCOLA
+    NULLIF(TRIM("CO_MUNICIPIO_ESC"), '')::VARCHAR(10) AS "CO_MUNICIPIO_ESC",
+    NULLIF(TRIM("NO_MUNICIPIO_ESC"), '')::VARCHAR(150) AS "NO_MUNICIPIO_ESC",
+    NULLIF(TRIM("CO_UF_ESC"), '')::INTEGER AS "CO_UF_ESC",
+    NULLIF(TRIM("SG_UF_ESC"), '')::VARCHAR(2) AS "SG_UF_ESC",
+    NULLIF(TRIM("TP_DEPENDENCIA_ADM_ESC"), '')::INTEGER AS "TP_DEPENDENCIA_ADM_ESC",
+    NULLIF(TRIM("TP_LOCALIZACAO_ESC"), '')::INTEGER AS "TP_LOCALIZACAO_ESC",
+    NULLIF(TRIM("TP_SIT_FUNC_ESC"), '')::INTEGER AS "TP_SIT_FUNC_ESC",
+
+    -- LOCAL DE APLICAÇÃO DA PROVA
+    NULLIF(TRIM("CO_MUNICIPIO_PROVA"), '')::VARCHAR(10) AS "CO_MUNICIPIO_PROVA",
+    NULLIF(TRIM("NO_MUNICIPIO_PROVA"), '')::VARCHAR(150) AS "NO_MUNICIPIO_PROVA",
+    NULLIF(TRIM("CO_UF_PROVA"), '')::INTEGER AS "CO_UF_PROVA",
+    NULLIF(TRIM("SG_UF_PROVA"), '')::VARCHAR(2) AS "SG_UF_PROVA",
+
+    -- PRESENÇA
+    NULLIF(TRIM("TP_PRESENCA_CN"), '')::INTEGER AS "TP_PRESENCA_CN",
+    NULLIF(TRIM("TP_PRESENCA_CH"), '')::INTEGER AS "TP_PRESENCA_CH",
+    NULLIF(TRIM("TP_PRESENCA_LC"), '')::INTEGER AS "TP_PRESENCA_LC",
+    NULLIF(TRIM("TP_PRESENCA_MT"), '')::INTEGER AS "TP_PRESENCA_MT",
+
+    -- QUESTIONÁRIO SOCIOECONÔMICO
+    NULLIF(TRIM("Q001"), '')::VARCHAR(2) AS "Q001",
+    NULLIF(TRIM("Q002"), '')::VARCHAR(2) AS "Q002",
+    NULLIF(TRIM("Q003"), '')::VARCHAR(2) AS "Q003",
+    NULLIF(TRIM("Q004"), '')::VARCHAR(2) AS "Q004",
+    NULLIF(TRIM("Q005"), '')::INTEGER AS "Q005",
+    NULLIF(TRIM("Q006"), '')::VARCHAR(2) AS "Q006",
+    NULLIF(TRIM("Q007"), '')::VARCHAR(2) AS "Q007",
+    NULLIF(TRIM("Q008"), '')::VARCHAR(2) AS "Q008",
+    NULLIF(TRIM("Q009"), '')::VARCHAR(2) AS "Q009",
+    NULLIF(TRIM("Q010"), '')::VARCHAR(2) AS "Q010",
+    NULLIF(TRIM("Q011"), '')::VARCHAR(2) AS "Q011",
+    NULLIF(TRIM("Q012"), '')::VARCHAR(2) AS "Q012",
+    NULLIF(TRIM("Q013"), '')::VARCHAR(2) AS "Q013",
+    NULLIF(TRIM("Q014"), '')::VARCHAR(2) AS "Q014",
+    NULLIF(TRIM("Q015"), '')::VARCHAR(2) AS "Q015",
+    NULLIF(TRIM("Q016"), '')::VARCHAR(2) AS "Q016",
+    NULLIF(TRIM("Q017"), '')::VARCHAR(2) AS "Q017",
+    NULLIF(TRIM("Q018"), '')::VARCHAR(2) AS "Q018",
+    NULLIF(TRIM("Q019"), '')::VARCHAR(2) AS "Q019",
+    NULLIF(TRIM("Q020"), '')::VARCHAR(2) AS "Q020",
+    NULLIF(TRIM("Q021"), '')::VARCHAR(2) AS "Q021",
+    NULLIF(TRIM("Q022"), '')::VARCHAR(2) AS "Q022",
+    NULLIF(TRIM("Q023"), '')::VARCHAR(2) AS "Q023",
+    NULLIF(TRIM("Q024"), '')::VARCHAR(2) AS "Q024",
+    NULLIF(TRIM("Q025"), '')::VARCHAR(2) AS "Q025"
+
+FROM dw_enem.microdados_enem_compilado_5_anos;
+2. O que esse SQL está fazendo?
+
+Não estamos alterando os valores das categorias.
+
+Estamos fazendo apenas:
+
+removendo espaços com TRIM();
+transformando vazio '' em NULL;
+colocando tipos coerentes;
+eliminando as colunas que você marcou como N.
+
+E, como combinamos, não estamos colocando notas, respostas, gabaritos, redação etc. nessa tabela, porque você marcou essas variáveis como N.
+
+3. Agora confira a quantidade de registros
+SELECT COUNT(*) AS total_registros
+FROM dw_enem.microdados_enem_tratado;
+
+Tem que continuar:
+
+21.678.172
+
+4. E confira os tipos
+
+No DBeaver, depois de dar Refresh em dw_enem, abra:
+
+microdados_enem_tratado
+    → Columns
