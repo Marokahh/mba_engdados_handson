@@ -74,32 +74,75 @@ A partir dessa questão, a análise buscará responder:
 
 Identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
 
-## Dados
+## Dados utilizados
 
-São utilizados os microdados oficiais do ENEM disponibilizados pelo INEP para os anos:
+O projeto utiliza os **microdados oficiais do ENEM disponibilizados pelo INEP**, considerando as edições de:
 
-Ano	Arquivo
-2019	MICRODADOS_ENEM_2019.csv
-2020	MICRODADOS_ENEM_2020.csv
-2021	MICRODADOS_ENEM_2021.csv
-2022	MICRODADOS_ENEM_2022.csv
-2023	MICRODADOS_ENEM_2023.csv
+| Ano  | Arquivo                    |
+| ---- | -------------------------- |
+| 2019 | `MICRODADOS_ENEM_2019.csv` |
+| 2020 | `MICRODADOS_ENEM_2020.csv` |
+| 2021 | `MICRODADOS_ENEM_2021.csv` |
+| 2022 | `MICRODADOS_ENEM_2022.csv` |
+| 2023 | `MICRODADOS_ENEM_2023.csv` |
 
-Cada arquivo contém informações dos participantes da respectiva edição do exame.
+Cada arquivo representa uma edição do exame e contém informações dos participantes.
 
-Entre as informações utilizadas na etapa de tratamento estão:
+### Principais grupos de informações utilizados
 
-Dados demográficos;
-Dados relacionados à escola;
-Dados relacionados ao local de aplicação;
-Informações de presença;
-Informações socioeconômicas;
-Informações sobre características familiares e domiciliares.
+* Dados demográficos
+* Dados relacionados à escola
+* Local de aplicação da prova
+* Informações de presença
+* Informações socioeconômicas
+* Características familiares e domiciliares
+* Informações relacionadas à inscrição
+
+> **Observação:** os arquivos originais possuem grande volume de dados e, por isso, não são armazenados no GitHub. Eles devem ser baixados e disponibilizados localmente na pasta `dados/`.
+
+# Arquitetura do projeto
+
+O projeto foi estruturado seguindo uma separação entre **dados de origem (staging)** e **dados tratados para análise (data warehouse)**.
+
+```text
+                    ┌──────────────────────┐
+                    │   Microdados ENEM    │
+                    │      INEP 2019-2023  │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │       Python         │
+                    │      Pandas          │
+                    │      extract.py      │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                 ┌────────────────────────────┐
+                 │        PostgreSQL          │
+                 │                            │
+                 │        stg_enem            │
+                 │   Dados carregados         │
+                 └────────────┬───────────────┘
+                              │
+                              ▼
+                 ┌────────────────────────────┐
+                 │        PostgreSQL          │
+                 │                            │
+                 │         dw_enem            │
+                 │ Dados compilados/tratados  │
+                 └────────────┬───────────────┘
+                              │
+                              ▼
+                    ┌──────────────────────┐
+                    │      Análises        │
+                    │      e Insights      │
+                    └──────────────────────┘
+```
 
 ## Estrutura do projeto
 
-A estrutura utilizada no projeto é:
-
+```text
 ProjetoMBA_QuemNaoFoi/
 │
 └── mba_engdados_handson/
@@ -120,255 +163,272 @@ ProjetoMBA_QuemNaoFoi/
     │
     ├── .env
     ├── .gitignore
+    ├── creations_sql.txt
     ├── requirements.txt
     └── README.md
+```
 
-Importante: os microdados devem estar dentro da pasta dados/ para que o extract.py consiga localizá-los.
+### Principais arquivos
 
-## Pré-requisitos
-
-Para reproduzir o projeto, é necessário instalar:
-
-Python 3.11 ou superior;
-PostgreSQL;
-DBeaver;
-Git, caso o projeto seja clonado do GitHub.
-
-O projeto utiliza as seguintes bibliotecas Python:
-
-pandas
-psycopg2-binary
-python-dotenv
+| Arquivo                  | Descrição                                                                   |
+| ------------------------ | --------------------------------------------------------------------------- |
+| `src/config.py`          | Carrega as configurações do banco a partir do `.env`                        |
+| `src/database.py`        | Gerencia a conexão com o PostgreSQL                                         |
+| `src/test_connection.py` | Testa a conexão entre Python e PostgreSQL                                   |
+| `src/extract.py`         | Realiza a leitura e carga dos microdados                                    |
+| `requirements.txt`       | Dependências Python do projeto                                              |
+| `.gitignore`             | Impede o envio de arquivos sensíveis e dos grandes microdados para o GitHub |
 
 
-# 1. Obter os microdados do ENEM
+## Tecnologias utilizadas
 
-Os arquivos utilizados são os microdados oficiais do ENEM disponibilizados pelo INEP.
+* **Python 3.11**
+* **Pandas**
+* **PostgreSQL**
+* **psycopg2**
+* **python-dotenv**
+* **DBeaver**
+* **SQL**
+* **Git**
+* **GitHub**
 
-É necessário baixar os arquivos correspondentes aos anos 2019, 2020, 2021, 2022 e 2023.
+# Como executar o projeto
 
-Após o download, os arquivos devem ser colocados dentro da pasta:
+## 1. Pré-requisitos
 
+Antes de iniciar, certifique-se de possuir:
+
+* Python 3.11 ou superior
+* PostgreSQL
+* DBeaver
+* Git
+
+## 2. Obter os microdados do ENEM
+
+Os microdados devem ser obtidos diretamente das fontes oficiais do INEP.
+Faça o download dos arquivos correspondentes aos anos:
+
+```text
+2019
+2020
+2021
+2022
+2023
+```
+Após o download, coloque os arquivos dentro de:
+```text
 mba_engdados_handson/dados/
-
-A pasta deverá ficar assim:
-
+```
+A estrutura esperada é:
+```text
 dados/
 ├── MICRODADOS_ENEM_2019.csv
 ├── MICRODADOS_ENEM_2020.csv
 ├── MICRODADOS_ENEM_2021.csv
 ├── MICRODADOS_ENEM_2022.csv
 └── MICRODADOS_ENEM_2023.csv
+```
+> Os arquivos são grandes. Verifique se cada download foi concluído corretamente antes de iniciar a extração.
 
-Os arquivos são grandes. Por isso, é importante verificar se o download foi concluído corretamente antes de iniciar a extração.
+## 3. Configurar o PostgreSQL
 
-# 2. Instalar e configurar o PostgreSQL
+Instale e configure o PostgreSQL.
 
-Instale o PostgreSQL na máquina.
+Neste projeto, a conexão utiliza:
 
-Durante a instalação, será definido o usuário administrador do banco, utilizado neste projeto como:
-
-Usuário: postgres
-Porta: 5432
+```text
 Host: localhost
+Porta: 5432
+Usuário: postgres
+Banco: enem
+```
+A senha deve ser a definida durante a instalação/configuração do PostgreSQL.
 
-Também será definida uma senha para o usuário postgres.
-
-Criar o banco de dados
-
-No PostgreSQL, crie um banco chamado:
-
+## 4. Criar o banco de dados
+Crie um banco chamado:
+```text
 enem
-
-O banco utilizado pelo projeto possui os seguintes schemas:
-
+```
+Depois de criado, o banco utilizará os seguintes schemas:
+```text
 enem
 ├── dw_enem
 ├── public
 └── stg_enem
+```
+Os schemas `stg_enem` e `dw_enem` representam diferentes etapas do fluxo de dados.
 
-Os schemas stg_enem e dw_enem serão utilizados para organizar as diferentes etapas do projeto.
-
-# 3. Configurar o banco no DBeaver
-
-Abra o DBeaver e crie uma nova conexão.
-
-Selecione:
-
-PostgreSQL
-
-Preencha:
-
+## 5. Configurar o DBeaver
+Abra o DBeaver e crie uma nova conexão PostgreSQL.
+Utilize:
+```text
 Host: localhost
 Port: 5432
 Database: enem
 Username: postgres
 Password: SUA_SENHA
-
-Clique em:
-
-Test Connection
-
-Se as informações estiverem corretas, o DBeaver deverá informar que a conexão foi estabelecida com sucesso.
-
-Depois de conectar ao banco enem, crie os schemas:
-
+```
+Clique em **Test Connection**.
+Se as configurações estiverem corretas, a conexão deverá ser estabelecida com sucesso.
+Depois, crie os schemas:
+```sql
 CREATE SCHEMA IF NOT EXISTS stg_enem;
 
 CREATE SCHEMA IF NOT EXISTS dw_enem;
-
-Após executar, clique em Refresh no banco.
-
-O resultado esperado é:
-
+```
+Atualize o banco utilizando **Refresh**.
+A estrutura esperada é:
+```text
 enem
 ├── dw_enem
 ├── public
 └── stg_enem
+```
 
-# 4. Configurar o ambiente Python
-
+## 6. Configurar o ambiente Python
 Abra o terminal na pasta do projeto:
-
+```powershell
 cd mba_engdados_handson
-
+```
 Instale as dependências:
-
+```powershell
 python -m pip install -r requirements.txt
-
-Para verificar se as principais bibliotecas foram instaladas:
-
+```
+Para validar a instalação:
+```powershell
 python -c "import pandas; import psycopg2; print('Dependências OK')"
-
-O resultado esperado é:
-
+```
+Resultado esperado:
+```text
 Dependências OK
+```
 
-# 5. Configurar o arquivo .env
-
-Na raiz de mba_engdados_handson, crie o arquivo:
-
+## 7. Configurar o `.env`
+Na raiz do projeto, crie um arquivo chamado:
+```text
 .env
-
-Ele deverá conter as informações de conexão com o PostgreSQL:
-
+```
+Preencha com as informações da conexão:
+```env
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=enem
 DB_USER=postgres
 DB_PASSWORD=SUA_SENHA
-
-Substitua SUA_SENHA pela senha definida para o usuário postgres.
-
-Importante: o arquivo .env não deve ser enviado para o GitHub. Ele deve estar listado no .gitignore.
-
-# 6. Testar a conexão com o banco
-
-Antes de executar a extração, é importante verificar se o Python consegue acessar o PostgreSQL.
-
-Execute:
-
+```
+Substitua `SUA_SENHA` pela senha configurada no PostgreSQL.
+> **Importante:** o arquivo `.env` contém informações sensíveis e não deve ser enviado ao GitHub.
+O `.gitignore` do projeto já possui a regra:
+```gitignore
+.env
+```
+## 8. Testar a conexão com o banco
+Antes de executar a extração, teste a conexão entre Python e PostgreSQL:
+```powershell
 python src/test_connection.py
-
-Se tudo estiver configurado corretamente, o resultado será semelhante a:
-
+```
+Resultado esperado:
+```text
 Conexão com PostgreSQL realizada com sucesso!
 Conexão encerrada.
+```
+Caso ocorra algum erro nessa etapa, corrija a configuração do banco antes de continuar.
 
-Caso apareça um erro nessa etapa, a extração não deve ser iniciada. Primeiro deve ser corrigida a configuração da conexão.
-
-# 7. Executar a extração dos microdados
-
-Com:
-
-PostgreSQL configurado;
-banco enem criado;
-schemas criados;
-.env configurado;
-dependências instaladas;
-arquivos CSV dentro de dados/;
-conexão testada;
-
-podemos executar:
-
+## 9. Executar a extração
+Com todos os requisitos configurados:
+* PostgreSQL instalado;
+* banco `enem` criado;
+* schemas criados;
+* `.env` configurado;
+* dependências instaladas;
+* microdados disponíveis em `dados/`;
+* conexão testada;
+Execute:
+```powershell
 python src/extract.py
-
-O script processará os cinco arquivos:
-
+```
+O script processará os arquivos:
+```text
 2019
 2020
 2021
 2022
 2023
+```
+Durante a execução, o processo realiza:
+1. Localização dos arquivos;
+2. Leitura dos CSVs utilizando Pandas;
+3. Identificação das colunas;
+4. Inspeção inicial dos dados;
+5. Criação das tabelas no PostgreSQL;
+6. Carga dos registros no banco.
 
-Durante a execução, o script utiliza o Pandas para:
+## 10. Tabelas geradas pela extração
 
-localizar o arquivo;
-ler o CSV;
-identificar as colunas;
-apresentar as primeiras linhas;
-apresentar os tipos identificados;
-criar a tabela correspondente no PostgreSQL;
-carregar os registros para o banco.
+Ao final da extração, serão criadas cinco tabelas no schema `stg_enem`:
 
-# 8. Tabelas geradas pela extração
-
-Ao final da execução, serão criadas cinco tabelas no schema stg_enem:
-
+```text
 stg_enem
 ├── microdados_enem_2019
 ├── microdados_enem_2020
 ├── microdados_enem_2021
 ├── microdados_enem_2022
 └── microdados_enem_2023
+```
 
-A quantidade de registros obtida durante a execução foi:
+### Quantidade de registros
 
-Ano	Registros
-2019	5.095.171
-2020	5.783.109
-2021	3.389.832
-2022	3.476.105
-2023	3.933.955
-Total	21.678.172
+|       Ano |      Registros |
+| --------: | -------------: |
+|      2019 |      5.095.171 |
+|      2020 |      5.783.109 |
+|      2021 |      3.389.832 |
+|      2022 |      3.476.105 |
+|      2023 |      3.933.955 |
+| **Total** | **21.678.172** |
 
-A execução pode levar algum tempo devido ao tamanho dos arquivos.
+> ⏱️ A execução pode levar algum tempo devido ao tamanho dos arquivos.
 
-# 9. Validação das tabelas de origem
+---
 
-Após executar o extract.py, abra o DBeaver e atualize o schema:
+# 🔎 11. Validar as tabelas de origem
 
+Após executar o `extract.py`, atualize o schema:
+
+```text
 stg_enem
+```
 
-As cinco tabelas devem estar disponíveis.
+As cinco tabelas deverão estar disponíveis.
 
-Também é possível validar diretamente pelo SQL.
+Para validar a quantidade de registros de uma edição:
 
-Por exemplo:
-
+```sql
 SELECT COUNT(*)
 FROM stg_enem.microdados_enem_2019;
+```
 
-O resultado esperado é:
+Resultado esperado:
 
+```text
 5.095.171
+```
 
 O mesmo procedimento pode ser realizado para os demais anos.
 
-# 10. Compilação dos cinco anos
+#  12. Compilar os cinco anos
 
-Depois que todas as tabelas foram carregadas no PostgreSQL, os cinco arquivos podem ser unidos em uma única tabela.
+Após o carregamento das cinco edições, os dados podem ser reunidos em uma única tabela.
 
-Como cada tabela representa uma edição diferente do ENEM, utilizamos UNION ALL.
+Para isso, utilizamos `UNION ALL`.
 
-Por que UNION ALL?
+### Por que `UNION ALL`?
 
-Não queremos que o PostgreSQL tente eliminar registros considerados duplicados.
-
-Nosso objetivo é simplesmente empilhar os registros dos cinco anos.
+O objetivo é **empilhar os registros das diferentes edições**, sem solicitar ao PostgreSQL que tente eliminar registros considerados duplicados.
 
 Execute:
 
+```sql
 CREATE TABLE dw_enem.microdados_enem_compilado_5_anos AS
 
 SELECT *
@@ -393,176 +453,209 @@ UNION ALL
 
 SELECT *
 FROM stg_enem.microdados_enem_2023;
+```
 
-# 11. Validar a tabela compilada
+#  13. Validar a tabela compilada
 
-Depois da criação, execute:
+Execute:
 
+```sql
 SELECT COUNT(*) AS total_registros
 FROM dw_enem.microdados_enem_compilado_5_anos;
+```
 
-O resultado esperado é:
+Resultado esperado:
 
+```text
 21.678.172
+```
 
-Esse número corresponde à soma dos cinco arquivos:
+Esse total corresponde à soma dos registros das cinco edições:
 
+```text
 5.095.171
 + 5.783.109
 + 3.389.832
 + 3.476.105
 + 3.933.955
-----------------
+-----------
 21.678.172
+```
 
-# 12. Validar os registros por ano
 
-Para verificar se os cinco anos foram realmente carregados:
+#  14. Validar os registros por ano
 
-SELECT 
+Também é importante garantir que os registros de cada edição foram carregados corretamente.
+
+Execute:
+
+```sql
+SELECT
     "NU_ANO",
     COUNT(*) AS quantidade
 FROM dw_enem.microdados_enem_compilado_5_anos
 GROUP BY "NU_ANO"
 ORDER BY "NU_ANO";
+```
 
-O resultado esperado é:
+Resultado esperado:
 
-NU_ANO	Quantidade
-2019	5.095.171
-2020	5.783.109
-2021	3.389.832
-2022	3.476.105
-2023	3.933.955
+| NU_ANO | Quantidade |
+| -----: | ---------: |
+|   2019 |  5.095.171 |
+|   2020 |  5.783.109 |
+|   2021 |  3.389.832 |
+|   2022 |  3.476.105 |
+|   2023 |  3.933.955 |
 
-# 13. Tratamento dos dados
 
-Após a análise do dicionário de variáveis, foi definido quais informações possuem maior valor para o projeto.
+#  15. Tratamento dos dados
 
-As variáveis consideradas desnecessárias para esta etapa foram removidas, enquanto as demais foram mantidas.
+Após a análise do dicionário de variáveis, foram selecionadas as informações consideradas relevantes para os objetivos do projeto.
 
-O tratamento realizado nesta etapa consiste em:
+O tratamento dos dados contempla:
 
-remover espaços extras com TRIM();
-transformar valores vazios em NULL;
-atribuir tipos de dados coerentes;
-manter as variáveis consideradas relevantes;
-eliminar as variáveis marcadas como não necessárias.
+* Remoção de espaços extras utilizando `TRIM()`;
+* Conversão de valores vazios para `NULL`;
+* Definição de tipos de dados coerentes;
+* Seleção das variáveis relevantes para a análise;
+* Exclusão das variáveis consideradas desnecessárias nesta etapa.
 
-Os valores das categorias não são alterados.
+Os valores das categorias são mantidos conforme a codificação original dos microdados.
 
-As notas, quando presentes nas etapas anteriores, são tratadas como valores numéricos, porém as variáveis classificadas como não necessárias no dicionário não fazem parte da tabela tratada.
+As variáveis numéricas são convertidas para tipos numéricos no PostgreSQL, enquanto variáveis categóricas permanecem como texto.
 
-# 14. Criar a tabela tratada
+---
 
-No DBeaver:
+# 16. Criar a tabela tratada
 
+A tabela tratada é criada no schema `dw_enem`.
+
+Primeiro, remova uma versão anterior, caso exista:
+
+```sql
 DROP TABLE IF EXISTS dw_enem.microdados_enem_tratado;
+```
 
-CREATE TABLE dw_enem.microdados_enem_tratado AS
-SELECT
-    -- DADOS DO PARTICIPANTE
-    TRIM("NU_INSCRICAO")::VARCHAR(20) AS "NU_INSCRICAO",
-    NULLIF(TRIM("NU_ANO"), '')::INTEGER AS "NU_ANO",
-    NULLIF(TRIM("TP_FAIXA_ETARIA"), '')::INTEGER AS "TP_FAIXA_ETARIA",
-    NULLIF(TRIM("TP_SEXO"), '')::VARCHAR(1) AS "TP_SEXO",
-    NULLIF(TRIM("TP_ESTADO_CIVIL"), '')::INTEGER AS "TP_ESTADO_CIVIL",
-    NULLIF(TRIM("TP_COR_RACA"), '')::INTEGER AS "TP_COR_RACA",
-    NULLIF(TRIM("TP_NACIONALIDADE"), '')::INTEGER AS "TP_NACIONALIDADE",
-    NULLIF(TRIM("TP_ST_CONCLUSAO"), '')::INTEGER AS "TP_ST_CONCLUSAO",
-    NULLIF(TRIM("TP_ANO_CONCLUIU"), '')::INTEGER AS "TP_ANO_CONCLUIU",
-    NULLIF(TRIM("TP_ESCOLA"), '')::INTEGER AS "TP_ESCOLA",
-    NULLIF(TRIM("TP_ENSINO"), '')::INTEGER AS "TP_ENSINO",
-    NULLIF(TRIM("IN_TREINEIRO"), '')::INTEGER AS "IN_TREINEIRO",
+Em seguida, execute o SQL disponível no arquivo:
 
-    -- DADOS DA ESCOLA
-    NULLIF(TRIM("CO_MUNICIPIO_ESC"), '')::VARCHAR(10) AS "CO_MUNICIPIO_ESC",
-    NULLIF(TRIM("NO_MUNICIPIO_ESC"), '')::VARCHAR(150) AS "NO_MUNICIPIO_ESC",
-    NULLIF(TRIM("CO_UF_ESC"), '')::INTEGER AS "CO_UF_ESC",
-    NULLIF(TRIM("SG_UF_ESC"), '')::VARCHAR(2) AS "SG_UF_ESC",
-    NULLIF(TRIM("TP_DEPENDENCIA_ADM_ESC"), '')::INTEGER AS "TP_DEPENDENCIA_ADM_ESC",
-    NULLIF(TRIM("TP_LOCALIZACAO_ESC"), '')::INTEGER AS "TP_LOCALIZACAO_ESC",
-    NULLIF(TRIM("TP_SIT_FUNC_ESC"), '')::INTEGER AS "TP_SIT_FUNC_ESC",
+```text
+creations_sql.txt
+```
 
-    -- LOCAL DE APLICAÇÃO DA PROVA
-    NULLIF(TRIM("CO_MUNICIPIO_PROVA"), '')::VARCHAR(10) AS "CO_MUNICIPIO_PROVA",
-    NULLIF(TRIM("NO_MUNICIPIO_PROVA"), '')::VARCHAR(150) AS "NO_MUNICIPIO_PROVA",
-    NULLIF(TRIM("CO_UF_PROVA"), '')::INTEGER AS "CO_UF_PROVA",
-    NULLIF(TRIM("SG_UF_PROVA"), '')::VARCHAR(2) AS "SG_UF_PROVA",
+A tabela tratada considera grupos de variáveis relacionados a:
 
-    -- PRESENÇA
-    NULLIF(TRIM("TP_PRESENCA_CN"), '')::INTEGER AS "TP_PRESENCA_CN",
-    NULLIF(TRIM("TP_PRESENCA_CH"), '')::INTEGER AS "TP_PRESENCA_CH",
-    NULLIF(TRIM("TP_PRESENCA_LC"), '')::INTEGER AS "TP_PRESENCA_LC",
-    NULLIF(TRIM("TP_PRESENCA_MT"), '')::INTEGER AS "TP_PRESENCA_MT",
+### Participante
 
-    -- QUESTIONÁRIO SOCIOECONÔMICO
-    NULLIF(TRIM("Q001"), '')::VARCHAR(2) AS "Q001",
-    NULLIF(TRIM("Q002"), '')::VARCHAR(2) AS "Q002",
-    NULLIF(TRIM("Q003"), '')::VARCHAR(2) AS "Q003",
-    NULLIF(TRIM("Q004"), '')::VARCHAR(2) AS "Q004",
-    NULLIF(TRIM("Q005"), '')::INTEGER AS "Q005",
-    NULLIF(TRIM("Q006"), '')::VARCHAR(2) AS "Q006",
-    NULLIF(TRIM("Q007"), '')::VARCHAR(2) AS "Q007",
-    NULLIF(TRIM("Q008"), '')::VARCHAR(2) AS "Q008",
-    NULLIF(TRIM("Q009"), '')::VARCHAR(2) AS "Q009",
-    NULLIF(TRIM("Q010"), '')::VARCHAR(2) AS "Q010",
-    NULLIF(TRIM("Q011"), '')::VARCHAR(2) AS "Q011",
-    NULLIF(TRIM("Q012"), '')::VARCHAR(2) AS "Q012",
-    NULLIF(TRIM("Q013"), '')::VARCHAR(2) AS "Q013",
-    NULLIF(TRIM("Q014"), '')::VARCHAR(2) AS "Q014",
-    NULLIF(TRIM("Q015"), '')::VARCHAR(2) AS "Q015",
-    NULLIF(TRIM("Q016"), '')::VARCHAR(2) AS "Q016",
-    NULLIF(TRIM("Q017"), '')::VARCHAR(2) AS "Q017",
-    NULLIF(TRIM("Q018"), '')::VARCHAR(2) AS "Q018",
-    NULLIF(TRIM("Q019"), '')::VARCHAR(2) AS "Q019",
-    NULLIF(TRIM("Q020"), '')::VARCHAR(2) AS "Q020",
-    NULLIF(TRIM("Q021"), '')::VARCHAR(2) AS "Q021",
-    NULLIF(TRIM("Q022"), '')::VARCHAR(2) AS "Q022",
-    NULLIF(TRIM("Q023"), '')::VARCHAR(2) AS "Q023",
-    NULLIF(TRIM("Q024"), '')::VARCHAR(2) AS "Q024",
-    NULLIF(TRIM("Q025"), '')::VARCHAR(2) AS "Q025"
+```text
+NU_INSCRICAO
+NU_ANO
+TP_FAIXA_ETARIA
+TP_SEXO
+TP_ESTADO_CIVIL
+TP_COR_RACA
+TP_NACIONALIDADE
+TP_ST_CONCLUSAO
+TP_ANO_CONCLUIU
+TP_ESCOLA
+TP_ENSINO
+IN_TREINEIRO
+```
 
-FROM dw_enem.microdados_enem_compilado_5_anos;
+###  Escola
 
-# 15. Validar a tabela tratada
+```text
+CO_MUNICIPIO_ESC
+NO_MUNICIPIO_ESC
+CO_UF_ESC
+SG_UF_ESC
+TP_DEPENDENCIA_ADM_ESC
+TP_LOCALIZACAO_ESC
+TP_SIT_FUNC_ESC
+```
 
-Depois de executar o SQL, confira a quantidade de registros:
+###  Local de aplicação
 
+```text
+CO_MUNICIPIO_PROVA
+NO_MUNICIPIO_PROVA
+CO_UF_PROVA
+SG_UF_PROVA
+```
+
+###  Presença
+
+```text
+TP_PRESENCA_CN
+TP_PRESENCA_CH
+TP_PRESENCA_LC
+TP_PRESENCA_MT
+```
+
+### 📝 Questionário socioeconômico
+
+```text
+Q001
+Q002
+Q003
+Q004
+Q005
+Q006
+...
+Q025
+```
+
+> O detalhamento completo da criação da tabela e dos tipos atribuídos às colunas está disponível em `creations_sql.txt`.
+
+
+#  17. Validar a tabela tratada
+
+Após a criação da tabela, valide a quantidade de registros:
+
+```sql
 SELECT COUNT(*) AS total_registros
 FROM dw_enem.microdados_enem_tratado;
+```
 
-O resultado esperado continua sendo:
+Resultado esperado:
 
+```text
 21.678.172
+```
 
-Isso é importante porque a etapa de limpeza não deve alterar a quantidade de participantes.
+A quantidade de participantes deve permanecer a mesma após o tratamento.
 
-# 16. Conferir os tipos das colunas
 
-No DBeaver:
+#  18. Validar os tipos das colunas
 
+No DBeaver, acesse:
+
+```text
 dw_enem
 └── microdados_enem_tratado
     └── Columns
+```
 
-Confira se os tipos das colunas correspondem aos definidos no SQL.
+Alguns exemplos de tipos esperados:
 
-Exemplos:
+| Coluna             | Tipo      |
+| ------------------ | --------- |
+| `NU_ANO`           | `INTEGER` |
+| `TP_FAIXA_ETARIA`  | `INTEGER` |
+| `TP_SEXO`          | `VARCHAR` |
+| `TP_COR_RACA`      | `INTEGER` |
+| `CO_MUNICIPIO_ESC` | `VARCHAR` |
+| `SG_UF_ESC`        | `VARCHAR` |
+| `Q001`             | `VARCHAR` |
+| `Q005`             | `INTEGER` |
 
-NU_ANO              INTEGER
-TP_FAIXA_ETARIA     INTEGER
-TP_SEXO             VARCHAR
-TP_COR_RACA         INTEGER
-CO_MUNICIPIO_ESC    VARCHAR
-SG_UF_ESC           VARCHAR
-Q001                VARCHAR
-Q005                INTEGER
+---
 
 # Estrutura final do banco
 
-Ao final desta etapa, o banco estará organizado aproximadamente da seguinte maneira:
+Ao final desta etapa, o banco estará organizado da seguinte forma:
 
+```text
 enem
 │
 ├── stg_enem
@@ -575,17 +668,95 @@ enem
 └── dw_enem
     ├── microdados_enem_compilado_5_anos
     └── microdados_enem_tratado
+```
 
-A camada stg_enem mantém os dados carregados a partir dos arquivos originais.
+### `stg_enem`
 
-A camada dw_enem concentra os dados compilados e tratados que serão utilizados nas próximas etapas do projeto.
+Armazena os dados carregados a partir dos arquivos originais, mantendo uma camada de staging para o processo de transformação.
 
-# Tecnologias utilizadas
-Python 3.11
-Pandas
-PostgreSQL
-psycopg2
-python-dotenv
-DBeaver
-SQL
-Git / GitHub
+### `dw_enem`
+
+Concentra os dados compilados e tratados que serão utilizados nas próximas etapas de análise.
+
+
+# Fluxo do ETL
+
+O fluxo desenvolvido até o momento pode ser resumido em:
+
+```text
+        MICRODADOS ENEM
+             │
+             ▼
+        ┌───────────┐
+        │  EXTRACT  │
+        │  Python   │
+        │  Pandas   │
+        └─────┬─────┘
+              │
+              ▼
+        ┌───────────┐
+        │   STAGE   │
+        │ stg_enem  │
+        └─────┬─────┘
+              │
+              ▼
+        ┌───────────┐
+        │ TRANSFORM │
+        │    SQL    │
+        └─────┬─────┘
+              │
+              ▼
+        ┌───────────┐
+        │    DW     │
+        │ dw_enem   │
+        └─────┬─────┘
+              │
+              ▼
+        ┌───────────┐
+        │  ANÁLISE  │
+        │  / BI     │
+        └───────────┘
+```
+
+# Próximas etapas
+
+Com a camada de dados estruturada, o projeto poderá avançar para a etapa analítica, buscando:
+
+* Identificar os principais padrões de abstenção;
+* Comparar presença e ausência entre diferentes perfis;
+* Analisar diferenças por gênero e faixa etária;
+* Investigar características socioeconômicas;
+* Avaliar diferenças regionais;
+* Comparar os padrões entre as edições;
+* Identificar grupos com taxas de ausência mais elevadas;
+* Gerar indicadores para apoiar a interpretação do fenômeno;
+* Propor práticas que possam contribuir para o aumento do comparecimento ao ENEM.
+
+O objetivo final é transformar os dados em **insights capazes de ajudar a entender onde e para quem a abstenção é mais frequente**.
+
+
+# Referências de dados
+
+Os dados utilizados neste projeto são os **microdados oficiais do Exame Nacional do Ensino Médio (ENEM)** disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**.
+
+Os arquivos devem ser obtidos diretamente das fontes oficiais e armazenados localmente na pasta `dados/`.
+
+# Observações sobre os arquivos de dados
+
+Os microdados do ENEM possuem grande volume e, por isso, **não são versionados no GitHub**.
+
+O `.gitignore` contém:
+
+```gitignore
+dados/*.csv
+```
+
+Dessa forma:
+
+* os arquivos permanecem disponíveis localmente para execução do projeto;
+* os arquivos não são enviados ao repositório;
+* o código e a documentação permanecem versionados;
+* novos colaboradores devem baixar os microdados separadamente.
+
+O arquivo `.env` também não é versionado, pois contém as credenciais de acesso ao banco de dados.
+
