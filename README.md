@@ -174,15 +174,7 @@ Instale:
 
 ## 2. Baixar os microdados
 
-Baixe os arquivos oficiais do INEP referentes aos anos:
-
-```text
-2019
-2020
-2021
-2022
-2023
-```
+Baixe os arquivos oficiais do INEP referentes aos anos 2019, 2020, 2021, 2022 e 2023.
 
 Coloque-os em:
 
@@ -192,14 +184,7 @@ mba_engdados_handson/dados/
 
 A estrutura deverá ser:
 
-```text
-dados/
-├── MICRODADOS_ENEM_2019.csv
-├── MICRODADOS_ENEM_2020.csv
-├── MICRODADOS_ENEM_2021.csv
-├── MICRODADOS_ENEM_2022.csv
-└── MICRODADOS_ENEM_2023.csv
-```
+<img width="352" height="132" alt="image" src="https://github.com/user-attachments/assets/cb887ce8-597a-434f-9f2a-4c0298b17e88" />
 
 ## 3. Configurar o PostgreSQL
 
