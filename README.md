@@ -100,45 +100,37 @@ Cada arquivo representa uma edição do exame e contém informações dos partic
 
 > **Observação:** os arquivos originais possuem grande volume de dados e, por isso, não são armazenados no GitHub. Eles devem ser baixados e disponibilizados localmente na pasta `dados/`.
 
-# Arquitetura do projeto
+## Arquitetura
 
-O projeto foi estruturado seguindo uma separação entre **dados de origem (staging)** e **dados tratados para análise (data warehouse)**.
+O projeto utiliza **Python/Pandas** para a extração e **PostgreSQL** para armazenamento, compilação e tratamento dos dados.
 
 ```text
-                    ┌──────────────────────┐
-                    │   Microdados ENEM    │
-                    │      INEP 2019-2023  │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                    ┌──────────────────────┐
-                    │       Python         │
-                    │      Pandas          │
-                    │      extract.py      │
-                    └──────────┬───────────┘
-                               │
-                               ▼
-                 ┌────────────────────────────┐
-                 │        PostgreSQL          │
-                 │                            │
-                 │        stg_enem            │
-                 │   Dados carregados         │
-                 └────────────┬───────────────┘
-                              │
-                              ▼
-                 ┌────────────────────────────┐
-                 │        PostgreSQL          │
-                 │                            │
-                 │         dw_enem            │
-                 │ Dados compilados/tratados  │
-                 └────────────┬───────────────┘
-                              │
-                              ▼
-                    ┌──────────────────────┐
-                    │      Análises        │
-                    │      e Insights      │
-                    └──────────────────────┘
+Microdados ENEM 2019–2023
+            │
+            ▼
+     Python + Pandas
+            │
+            ▼
+       PostgreSQL
+            │
+      ┌─────┴─────┐
+      ▼           ▼
+  stg_enem     dw_enem
+      │           │
+      │      Dados tratados
+      │           │
+      └───────────┘
+            │
+            ▼
+       Análises / BI
 ```
+
+### Camadas do banco
+**`stg_enem`**
+Armazena os dados carregados a partir dos arquivos originais.
+**`dw_enem`**
+Concentra os dados compilados e tratados que serão utilizados nas análises.
+---
 
 ## Estrutura do projeto
 
@@ -163,24 +155,22 @@ ProjetoMBA_QuemNaoFoi/
     │
     ├── .env
     ├── .gitignore
-    ├── creations_sql.txt
     ├── requirements.txt
     └── README.md
 ```
 
 ### Principais arquivos
 
-| Arquivo                  | Descrição                                                                   |
-| ------------------------ | --------------------------------------------------------------------------- |
-| `src/config.py`          | Carrega as configurações do banco a partir do `.env`                        |
-| `src/database.py`        | Gerencia a conexão com o PostgreSQL                                         |
-| `src/test_connection.py` | Testa a conexão entre Python e PostgreSQL                                   |
-| `src/extract.py`         | Realiza a leitura e carga dos microdados                                    |
-| `requirements.txt`       | Dependências Python do projeto                                              |
-| `.gitignore`             | Impede o envio de arquivos sensíveis e dos grandes microdados para o GitHub |
+| Arquivo                  | Função                                        |
+| ------------------------ | --------------------------------------------- |
+| `src/config.py`          | Carrega as configurações do banco             |
+| `src/database.py`        | Gerencia a conexão com o PostgreSQL           |
+| `src/test_connection.py` | Testa a conexão com o banco                   |
+| `src/extract.py`         | Realiza a extração e carga dos microdados     |
+| `requirements.txt`       | Dependências Python                           |
+| `.gitignore`             | Define arquivos que não devem ser versionados |
 
-
-## Tecnologias utilizadas
+## Tecnologias
 
 * **Python 3.11**
 * **Pandas**
@@ -189,25 +179,19 @@ ProjetoMBA_QuemNaoFoi/
 * **python-dotenv**
 * **DBeaver**
 * **SQL**
-* **Git**
-* **GitHub**
+* **Git / GitHub**
 
-# Como executar o projeto
+# Como executar
 
 ## 1. Pré-requisitos
+Instale:
+* Python 3.11 ou superior;
+* PostgreSQL;
+* DBeaver;
+* Git.
 
-Antes de iniciar, certifique-se de possuir:
-
-* Python 3.11 ou superior
-* PostgreSQL
-* DBeaver
-* Git
-
-## 2. Obter os microdados do ENEM
-
-Os microdados devem ser obtidos diretamente das fontes oficiais do INEP.
-Faça o download dos arquivos correspondentes aos anos:
-
+## 2. Baixar os microdados
+Baixe os arquivos oficiais do INEP referentes aos anos:
 ```text
 2019
 2020
@@ -215,11 +199,11 @@ Faça o download dos arquivos correspondentes aos anos:
 2022
 2023
 ```
-Após o download, coloque os arquivos dentro de:
+Coloque-os em:
 ```text
 mba_engdados_handson/dados/
 ```
-A estrutura esperada é:
+A estrutura deverá ser:
 ```text
 dados/
 ├── MICRODADOS_ENEM_2019.csv
@@ -228,39 +212,29 @@ dados/
 ├── MICRODADOS_ENEM_2022.csv
 └── MICRODADOS_ENEM_2023.csv
 ```
-> Os arquivos são grandes. Verifique se cada download foi concluído corretamente antes de iniciar a extração.
 
 ## 3. Configurar o PostgreSQL
-
-Instale e configure o PostgreSQL.
-
-Neste projeto, a conexão utiliza:
-
+Crie um banco chamado:
+```text
+enem
+```
+A conexão utilizada pelo projeto é:
 ```text
 Host: localhost
 Porta: 5432
 Usuário: postgres
 Banco: enem
 ```
-A senha deve ser a definida durante a instalação/configuração do PostgreSQL.
-
-## 4. Criar o banco de dados
-Crie um banco chamado:
-```text
-enem
+No banco, crie os schemas:
+```sql
+CREATE SCHEMA IF NOT EXISTS stg_enem;
+CREATE SCHEMA IF NOT EXISTS dw_enem;
 ```
-Depois de criado, o banco utilizará os seguintes schemas:
-```text
-enem
-├── dw_enem
-├── public
-└── stg_enem
-```
-Os schemas `stg_enem` e `dw_enem` representam diferentes etapas do fluxo de dados.
 
-## 5. Configurar o DBeaver
-Abra o DBeaver e crie uma nova conexão PostgreSQL.
-Utilize:
+## 4. Configurar o DBeaver
+
+Crie uma conexão PostgreSQL utilizando:
+
 ```text
 Host: localhost
 Port: 5432
@@ -268,24 +242,10 @@ Database: enem
 Username: postgres
 Password: SUA_SENHA
 ```
-Clique em **Test Connection**.
-Se as configurações estiverem corretas, a conexão deverá ser estabelecida com sucesso.
-Depois, crie os schemas:
-```sql
-CREATE SCHEMA IF NOT EXISTS stg_enem;
+Utilize **Test Connection** para verificar a conexão.
 
-CREATE SCHEMA IF NOT EXISTS dw_enem;
-```
-Atualize o banco utilizando **Refresh**.
-A estrutura esperada é:
-```text
-enem
-├── dw_enem
-├── public
-└── stg_enem
-```
+## 5. Instalar as dependências
 
-## 6. Configurar o ambiente Python
 Abra o terminal na pasta do projeto:
 ```powershell
 cd mba_engdados_handson
@@ -294,21 +254,19 @@ Instale as dependências:
 ```powershell
 python -m pip install -r requirements.txt
 ```
-Para validar a instalação:
+Valide a instalação:
 ```powershell
 python -c "import pandas; import psycopg2; print('Dependências OK')"
 ```
 Resultado esperado:
+
 ```text
 Dependências OK
 ```
 
-## 7. Configurar o `.env`
-Na raiz do projeto, crie um arquivo chamado:
-```text
-.env
-```
-Preencha com as informações da conexão:
+## 6. Configurar o `.env`
+
+Crie o arquivo `.env` na raiz do projeto:
 ```env
 DB_HOST=localhost
 DB_PORT=5432
@@ -316,14 +274,12 @@ DB_NAME=enem
 DB_USER=postgres
 DB_PASSWORD=SUA_SENHA
 ```
-Substitua `SUA_SENHA` pela senha configurada no PostgreSQL.
-> **Importante:** o arquivo `.env` contém informações sensíveis e não deve ser enviado ao GitHub.
-O `.gitignore` do projeto já possui a regra:
-```gitignore
-.env
-```
-## 8. Testar a conexão com o banco
-Antes de executar a extração, teste a conexão entre Python e PostgreSQL:
+Substitua `SUA_SENHA` pela senha do PostgreSQL.
+> O `.env` não deve ser enviado ao GitHub, pois contém credenciais.
+
+## 7. Testar a conexão
+
+Execute:
 ```powershell
 python src/test_connection.py
 ```
@@ -332,41 +288,16 @@ Resultado esperado:
 Conexão com PostgreSQL realizada com sucesso!
 Conexão encerrada.
 ```
-Caso ocorra algum erro nessa etapa, corrija a configuração do banco antes de continuar.
 
-## 9. Executar a extração
-Com todos os requisitos configurados:
-* PostgreSQL instalado;
-* banco `enem` criado;
-* schemas criados;
-* `.env` configurado;
-* dependências instaladas;
-* microdados disponíveis em `dados/`;
-* conexão testada;
-Execute:
+## 8. Executar a extração
+
+Com os arquivos CSV em `dados/` e a conexão configurada, execute:
 ```powershell
 python src/extract.py
 ```
-O script processará os arquivos:
-```text
-2019
-2020
-2021
-2022
-2023
-```
-Durante a execução, o processo realiza:
-1. Localização dos arquivos;
-2. Leitura dos CSVs utilizando Pandas;
-3. Identificação das colunas;
-4. Inspeção inicial dos dados;
-5. Criação das tabelas no PostgreSQL;
-6. Carga dos registros no banco.
 
-## 10. Tabelas geradas pela extração
-
-Ao final da extração, serão criadas cinco tabelas no schema `stg_enem`:
-
+O script utiliza **Pandas** para ler os arquivos e carregá-los no PostgreSQL.
+Ao final, serão criadas cinco tabelas no schema `stg_enem`:
 ```text
 stg_enem
 ├── microdados_enem_2019
@@ -375,8 +306,7 @@ stg_enem
 ├── microdados_enem_2022
 └── microdados_enem_2023
 ```
-
-### Quantidade de registros
+### Registros carregados
 
 |       Ano |      Registros |
 | --------: | -------------: |
@@ -387,47 +317,12 @@ stg_enem
 |      2023 |      3.933.955 |
 | **Total** | **21.678.172** |
 
-> ⏱️ A execução pode levar algum tempo devido ao tamanho dos arquivos.
-
 ---
 
-# 🔎 11. Validar as tabelas de origem
+## 9. Compilar os dados
 
-Após executar o `extract.py`, atualize o schema:
-
-```text
-stg_enem
-```
-
-As cinco tabelas deverão estar disponíveis.
-
-Para validar a quantidade de registros de uma edição:
-
-```sql
-SELECT COUNT(*)
-FROM stg_enem.microdados_enem_2019;
-```
-
-Resultado esperado:
-
-```text
-5.095.171
-```
-
-O mesmo procedimento pode ser realizado para os demais anos.
-
-#  12. Compilar os cinco anos
-
-Após o carregamento das cinco edições, os dados podem ser reunidos em uma única tabela.
-
-Para isso, utilizamos `UNION ALL`.
-
-### Por que `UNION ALL`?
-
-O objetivo é **empilhar os registros das diferentes edições**, sem solicitar ao PostgreSQL que tente eliminar registros considerados duplicados.
-
-Execute:
-
+Após a extração, os cinco anos são reunidos em uma única tabela no `dw_enem`.
+É utilizado `UNION ALL` para empilhar os registros das diferentes edições sem eliminar possíveis duplicidades.
 ```sql
 CREATE TABLE dw_enem.microdados_enem_compilado_5_anos AS
 
@@ -455,9 +350,7 @@ SELECT *
 FROM stg_enem.microdados_enem_2023;
 ```
 
-#  13. Validar a tabela compilada
-
-Execute:
+Valide o total:
 
 ```sql
 SELECT COUNT(*) AS total_registros
@@ -470,24 +363,7 @@ Resultado esperado:
 21.678.172
 ```
 
-Esse total corresponde à soma dos registros das cinco edições:
-
-```text
-5.095.171
-+ 5.783.109
-+ 3.389.832
-+ 3.476.105
-+ 3.933.955
------------
-21.678.172
-```
-
-
-#  14. Validar os registros por ano
-
-Também é importante garantir que os registros de cada edição foram carregados corretamente.
-
-Execute:
+## 10. Validar os dados por ano
 
 ```sql
 SELECT
@@ -500,263 +376,82 @@ ORDER BY "NU_ANO";
 
 Resultado esperado:
 
-| NU_ANO | Quantidade |
-| -----: | ---------: |
-|   2019 |  5.095.171 |
-|   2020 |  5.783.109 |
-|   2021 |  3.389.832 |
-|   2022 |  3.476.105 |
-|   2023 |  3.933.955 |
+|  Ano | Registros |
+| ---: | --------: |
+| 2019 | 5.095.171 |
+| 2020 | 5.783.109 |
+| 2021 | 3.389.832 |
+| 2022 | 3.476.105 |
+| 2023 | 3.933.955 |
 
 
-#  15. Tratamento dos dados
+## 11. Tratamento dos dados
 
-Após a análise do dicionário de variáveis, foram selecionadas as informações consideradas relevantes para os objetivos do projeto.
-
-O tratamento dos dados contempla:
-
-* Remoção de espaços extras utilizando `TRIM()`;
+A partir da análise do dicionário de variáveis, foram selecionadas as informações relevantes para os objetivos do projeto.
+O tratamento inclui:
+* Remoção de espaços extras com `TRIM()`;
 * Conversão de valores vazios para `NULL`;
-* Definição de tipos de dados coerentes;
-* Seleção das variáveis relevantes para a análise;
-* Exclusão das variáveis consideradas desnecessárias nesta etapa.
-
-Os valores das categorias são mantidos conforme a codificação original dos microdados.
-
-As variáveis numéricas são convertidas para tipos numéricos no PostgreSQL, enquanto variáveis categóricas permanecem como texto.
-
----
-
-# 16. Criar a tabela tratada
-
-A tabela tratada é criada no schema `dw_enem`.
-
-Primeiro, remova uma versão anterior, caso exista:
-
-```sql
-DROP TABLE IF EXISTS dw_enem.microdados_enem_tratado;
-```
-
-Em seguida, execute o SQL disponível no arquivo:
-
+* Definição de tipos de dados;
+* Seleção das variáveis relevantes;
+* Exclusão das variáveis consideradas desnecessárias.
+A criação da tabela tratada está documentada em:
 ```text
 creations_sql.txt
 ```
 
-A tabela tratada considera grupos de variáveis relacionados a:
+## 12. Tabela tratada
 
-### Participante
-
+A tabela final de análise é:
 ```text
-NU_INSCRICAO
-NU_ANO
-TP_FAIXA_ETARIA
-TP_SEXO
-TP_ESTADO_CIVIL
-TP_COR_RACA
-TP_NACIONALIDADE
-TP_ST_CONCLUSAO
-TP_ANO_CONCLUIU
-TP_ESCOLA
-TP_ENSINO
-IN_TREINEIRO
+dw_enem.microdados_enem_tratado
 ```
-
-###  Escola
-
-```text
-CO_MUNICIPIO_ESC
-NO_MUNICIPIO_ESC
-CO_UF_ESC
-SG_UF_ESC
-TP_DEPENDENCIA_ADM_ESC
-TP_LOCALIZACAO_ESC
-TP_SIT_FUNC_ESC
-```
-
-###  Local de aplicação
-
-```text
-CO_MUNICIPIO_PROVA
-NO_MUNICIPIO_PROVA
-CO_UF_PROVA
-SG_UF_PROVA
-```
-
-###  Presença
-
-```text
-TP_PRESENCA_CN
-TP_PRESENCA_CH
-TP_PRESENCA_LC
-TP_PRESENCA_MT
-```
-
-### 📝 Questionário socioeconômico
-
-```text
-Q001
-Q002
-Q003
-Q004
-Q005
-Q006
-...
-Q025
-```
-
-> O detalhamento completo da criação da tabela e dos tipos atribuídos às colunas está disponível em `creations_sql.txt`.
-
-
-#  17. Validar a tabela tratada
-
-Após a criação da tabela, valide a quantidade de registros:
-
+Ela reúne variáveis relacionadas principalmente a:
+* Perfil do participante;
+* Escola;
+* Local de aplicação;
+* Presença;
+* Questionário socioeconômico.
+Para recriar a tabela, utilize o SQL disponível em `creations_sql.txt`.
+Valide a quantidade de registros:
 ```sql
 SELECT COUNT(*) AS total_registros
 FROM dw_enem.microdados_enem_tratado;
 ```
-
 Resultado esperado:
-
 ```text
 21.678.172
 ```
 
-A quantidade de participantes deve permanecer a mesma após o tratamento.
-
-
-#  18. Validar os tipos das colunas
-
-No DBeaver, acesse:
-
-```text
-dw_enem
-└── microdados_enem_tratado
-    └── Columns
-```
-
-Alguns exemplos de tipos esperados:
-
-| Coluna             | Tipo      |
-| ------------------ | --------- |
-| `NU_ANO`           | `INTEGER` |
-| `TP_FAIXA_ETARIA`  | `INTEGER` |
-| `TP_SEXO`          | `VARCHAR` |
-| `TP_COR_RACA`      | `INTEGER` |
-| `CO_MUNICIPIO_ESC` | `VARCHAR` |
-| `SG_UF_ESC`        | `VARCHAR` |
-| `Q001`             | `VARCHAR` |
-| `Q005`             | `INTEGER` |
-
 ---
 
-# Estrutura final do banco
+## Estrutura final do banco
 
-Ao final desta etapa, o banco estará organizado da seguinte forma:
+<img width="382" height="218" alt="image" src="https://github.com/user-attachments/assets/2e4e0675-c566-43c1-8f76-5104e4a40c43" />
 
-```text
-enem
-│
-├── stg_enem
-│   ├── microdados_enem_2019
-│   ├── microdados_enem_2020
-│   ├── microdados_enem_2021
-│   ├── microdados_enem_2022
-│   └── microdados_enem_2023
-│
-└── dw_enem
-    ├── microdados_enem_compilado_5_anos
-    └── microdados_enem_tratado
-```
-
-### `stg_enem`
-
-Armazena os dados carregados a partir dos arquivos originais, mantendo uma camada de staging para o processo de transformação.
-
-### `dw_enem`
-
-Concentra os dados compilados e tratados que serão utilizados nas próximas etapas de análise.
-
-
-# Fluxo do ETL
-
-O fluxo desenvolvido até o momento pode ser resumido em:
-
-```text
-        MICRODADOS ENEM
-             │
-             ▼
-        ┌───────────┐
-        │  EXTRACT  │
-        │  Python   │
-        │  Pandas   │
-        └─────┬─────┘
-              │
-              ▼
-        ┌───────────┐
-        │   STAGE   │
-        │ stg_enem  │
-        └─────┬─────┘
-              │
-              ▼
-        ┌───────────┐
-        │ TRANSFORM │
-        │    SQL    │
-        └─────┬─────┘
-              │
-              ▼
-        ┌───────────┐
-        │    DW     │
-        │ dw_enem   │
-        └─────┬─────┘
-              │
-              ▼
-        ┌───────────┐
-        │  ANÁLISE  │
-        │  / BI     │
-        └───────────┘
-```
-
-# Próximas etapas
-
-Com a camada de dados estruturada, o projeto poderá avançar para a etapa analítica, buscando:
-
-* Identificar os principais padrões de abstenção;
-* Comparar presença e ausência entre diferentes perfis;
-* Analisar diferenças por gênero e faixa etária;
-* Investigar características socioeconômicas;
-* Avaliar diferenças regionais;
-* Comparar os padrões entre as edições;
-* Identificar grupos com taxas de ausência mais elevadas;
-* Gerar indicadores para apoiar a interpretação do fenômeno;
-* Propor práticas que possam contribuir para o aumento do comparecimento ao ENEM.
-
-O objetivo final é transformar os dados em **insights capazes de ajudar a entender onde e para quem a abstenção é mais frequente**.
-
-
-# Referências de dados
-
-Os dados utilizados neste projeto são os **microdados oficiais do Exame Nacional do Ensino Médio (ENEM)** disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**.
-
-Os arquivos devem ser obtidos diretamente das fontes oficiais e armazenados localmente na pasta `dados/`.
-
-# Observações sobre os arquivos de dados
-
-Os microdados do ENEM possuem grande volume e, por isso, **não são versionados no GitHub**.
-
+## Versionamento dos dados
+Os arquivos CSV do ENEM não são armazenados no GitHub devido ao seu grande volume.
 O `.gitignore` contém:
-
 ```gitignore
 dados/*.csv
 ```
+O arquivo `.env` também não é versionado:
+```gitignore
+.env
+```
+Dessa forma, o repositório mantém apenas **código, scripts, configurações e documentação**, enquanto os dados brutos devem ser obtidos separadamente.
 
-Dessa forma:
+## Próximas etapas
+Com a camada de dados estruturada, as próximas etapas do projeto serão voltadas à análise da abstenção, buscando:
+* Identificar padrões de ausência;
+* Comparar diferentes perfis de participantes;
+* Investigar características socioeconômicas;
+* Avaliar diferenças regionais;
+* Comparar as edições do ENEM;
+* Identificar grupos com maiores taxas de ausência;
+* Transformar os resultados em insights e possíveis práticas para aumentar o comparecimento.
 
-* os arquivos permanecem disponíveis localmente para execução do projeto;
-* os arquivos não são enviados ao repositório;
-* o código e a documentação permanecem versionados;
-* novos colaboradores devem baixar os microdados separadamente.
+> **Da inscrição à ausência: o objetivo é entender quem não chegou até a prova — e o que os dados podem revelar sobre isso.**
 
-O arquivo `.env` também não é versionado, pois contém as credenciais de acesso ao banco de dados.
-
+## Fonte dos dados
+**Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira — INEP**
+Os microdados utilizados neste projeto são oficiais e devem ser obtidos diretamente das fontes disponibilizadas pelo INEP.
