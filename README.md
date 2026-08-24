@@ -137,28 +137,7 @@ Concentra os dados compilados e tratados que serão utilizados nas análises.
 
 ## Estrutura do projeto
 
-```text
-mba_engdados_handson/
-    │
-    ├── dados/
-    │   ├── MICRODADOS_ENEM_2019.csv
-    │   ├── MICRODADOS_ENEM_2020.csv
-    │   ├── MICRODADOS_ENEM_2021.csv
-    │   ├── MICRODADOS_ENEM_2022.csv
-    │   └── MICRODADOS_ENEM_2023.csv
-    │
-    ├── src/
-    │   ├── __init__.py
-    │   ├── config.py
-    │   ├── database.py
-    │   ├── extract.py
-    │   └── test_connection.py
-    │
-    ├── .env
-    ├── .gitignore
-    ├── requirements.txt
-    └── README.md
-```
+<img width="367" height="418" alt="image" src="https://github.com/user-attachments/assets/2dada451-9201-4207-9be1-f8729606a28c" />
 
 ### Principais arquivos
 
@@ -185,14 +164,18 @@ mba_engdados_handson/
 # Como executar
 
 ## 1. Pré-requisitos
+
 Instale:
+
 * Python 3.11 ou superior;
 * PostgreSQL;
 * DBeaver;
 * Git.
 
 ## 2. Baixar os microdados
+
 Baixe os arquivos oficiais do INEP referentes aos anos:
+
 ```text
 2019
 2020
@@ -200,11 +183,15 @@ Baixe os arquivos oficiais do INEP referentes aos anos:
 2022
 2023
 ```
+
 Coloque-os em:
+
 ```text
 mba_engdados_handson/dados/
 ```
+
 A estrutura deverá ser:
+
 ```text
 dados/
 ├── MICRODADOS_ENEM_2019.csv
@@ -215,18 +202,24 @@ dados/
 ```
 
 ## 3. Configurar o PostgreSQL
+
 Crie um banco chamado:
+
 ```text
 enem
 ```
+
 A conexão utilizada pelo projeto é:
+
 ```text
 Host: localhost
 Porta: 5432
 Usuário: postgres
 Banco: enem
 ```
+
 No banco, crie os schemas:
+
 ```sql
 CREATE SCHEMA IF NOT EXISTS stg_enem;
 CREATE SCHEMA IF NOT EXISTS dw_enem;
@@ -243,22 +236,29 @@ Database: enem
 Username: postgres
 Password: SUA_SENHA
 ```
+
 Utilize **Test Connection** para verificar a conexão.
 
 ## 5. Instalar as dependências
 
 Abra o terminal na pasta do projeto:
+
 ```powershell
 cd mba_engdados_handson
 ```
+
 Instale as dependências:
+
 ```powershell
 python -m pip install -r requirements.txt
 ```
+
 Valide a instalação:
+
 ```powershell
 python -c "import pandas; import psycopg2; print('Dependências OK')"
 ```
+
 Resultado esperado:
 
 ```text
@@ -307,14 +307,7 @@ O script utiliza **Pandas** para ler os arquivos e carregá-los no PostgreSQL.
 
 Ao final, serão criadas cinco tabelas no schema `stg_enem`:
 
-```text
-stg_enem
-├── microdados_enem_2019
-├── microdados_enem_2020
-├── microdados_enem_2021
-├── microdados_enem_2022
-└── microdados_enem_2023
-```
+<img width="336" height="111" alt="image" src="https://github.com/user-attachments/assets/7757c99e-f6ae-41a1-b285-96583e7857a8" />
 
 ### Registros carregados
 
@@ -386,14 +379,7 @@ ORDER BY "NU_ANO";
 
 Resultado esperado:
 
-|  Ano | Registros |
-| ---: | --------: |
-| 2019 | 5.095.171 |
-| 2020 | 5.783.109 |
-| 2021 | 3.389.832 |
-| 2022 | 3.476.105 |
-| 2023 | 3.933.955 |
-
+<img width="253" height="122" alt="image" src="https://github.com/user-attachments/assets/d56d2466-63fe-427e-bb51-166707d8c6d9" />
 
 ## 11. Tratamento dos dados
 
@@ -406,7 +392,7 @@ O tratamento inclui:
 * Definição de tipos de dados;
 * Seleção das variáveis relevantes;
 * Exclusão das variáveis consideradas desnecessárias.
-* 
+
 A criação da tabela tratada está documentada em:
 
 ```text
