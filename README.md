@@ -419,7 +419,7 @@ Resultado esperado:
 
 ## Versionamento dos dados
 
-Os arquivos CSV do ENEM não são armazenados no GitHub devido ao seu grande volume (~3 GB de dados - ~600 MB por ano).
+Os arquivos CSV do ENEM não são armazenados no GitHub devido ao seu grande volume (~14 GB de dados).
 
 O `.gitignore` contém:
 ```gitignore
