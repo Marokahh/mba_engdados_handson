@@ -137,28 +137,7 @@ Concentra os dados compilados e tratados que serão utilizados nas análises.
 
 ## Estrutura do projeto
 
-```text
-mba_engdados_handson/
-    │
-    ├── dados/
-    │   ├── MICRODADOS_ENEM_2019.csv
-    │   ├── MICRODADOS_ENEM_2020.csv
-    │   ├── MICRODADOS_ENEM_2021.csv
-    │   ├── MICRODADOS_ENEM_2022.csv
-    │   └── MICRODADOS_ENEM_2023.csv
-    │
-    ├── src/
-    │   ├── __init__.py
-    │   ├── config.py
-    │   ├── database.py
-    │   ├── extract.py
-    │   └── test_connection.py
-    │
-    ├── .env
-    ├── .gitignore
-    ├── requirements.txt
-    └── README.md
-```
+<img width="367" height="418" alt="image" src="https://github.com/user-attachments/assets/2dada451-9201-4207-9be1-f8729606a28c" />
 
 ### Principais arquivos
 
@@ -185,56 +164,55 @@ mba_engdados_handson/
 # Como executar
 
 ## 1. Pré-requisitos
-Instale:
+
+Instalou-se:
+
 * Python 3.11 ou superior;
 * PostgreSQL;
 * DBeaver;
 * Git.
 
 ## 2. Baixar os microdados
-Baixe os arquivos oficiais do INEP referentes aos anos:
-```text
-2019
-2020
-2021
-2022
-2023
-```
+
+Baixamos os arquivos oficiais do INEP referentes aos anos 2019, 2020, 2021, 2022 e 2023.
+
 Coloque-os em:
+
 ```text
 mba_engdados_handson/dados/
 ```
-A estrutura deverá ser:
-```text
-dados/
-├── MICRODADOS_ENEM_2019.csv
-├── MICRODADOS_ENEM_2020.csv
-├── MICRODADOS_ENEM_2021.csv
-├── MICRODADOS_ENEM_2022.csv
-└── MICRODADOS_ENEM_2023.csv
-```
 
-## 3. Configurar o PostgreSQL
-Crie um banco chamado:
+A estrutura criada foi:
+
+<img width="352" height="132" alt="image" src="https://github.com/user-attachments/assets/cb887ce8-597a-434f-9f2a-4c0298b17e88" />
+
+## 3. Configuração do PostgreSQL
+
+Criamos um banco chamado:
+
 ```text
 enem
 ```
-A conexão utilizada pelo projeto é:
+
+A conexão utilizada pelo projeto:
+
 ```text
 Host: localhost
 Porta: 5432
 Usuário: postgres
 Banco: enem
 ```
-No banco, crie os schemas:
+
+No banco, criou-se os schemas:
+
 ```sql
 CREATE SCHEMA IF NOT EXISTS stg_enem;
 CREATE SCHEMA IF NOT EXISTS dw_enem;
 ```
 
-## 4. Configurar o DBeaver
+## 4. Configuração do DBeaver
 
-Crie uma conexão PostgreSQL utilizando:
+Fizemos uma conexão PostgreSQL utilizando:
 
 ```text
 Host: localhost
@@ -243,22 +221,29 @@ Database: enem
 Username: postgres
 Password: SUA_SENHA
 ```
-Utilize **Test Connection** para verificar a conexão.
+
+ **Test Connection** feito para verificar a conexão.
 
 ## 5. Instalar as dependências
 
-Abra o terminal na pasta do projeto:
+Abrimos o terminal na pasta do projeto:
+
 ```powershell
 cd mba_engdados_handson
 ```
-Instale as dependências:
+
+Instalamos as dependências:
+
 ```powershell
 python -m pip install -r requirements.txt
 ```
-Valide a instalação:
+
+Validamos a instalação:
+
 ```powershell
 python -c "import pandas; import psycopg2; print('Dependências OK')"
 ```
+
 Resultado esperado:
 
 ```text
@@ -267,22 +252,21 @@ Dependências OK
 
 ## 6. Configurar o `.env`
 
-Crie o arquivo `.env` na raiz do projeto:
+Criação do arquivo `.env` na raiz do projeto:
 
 ```env
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=enem
 DB_USER=postgres
-DB_PASSWORD=SUA_SENHA
+DB_PASSWORD=NOSSA_SENHA
 ```
-Substitua `SUA_SENHA` pela senha do PostgreSQL.
 
-> O `.env` não deve ser enviado ao GitHub, pois contém credenciais.
+> O `.env` não foi enviado ao GitHub, pois contém credenciais.
 
-## 7. Testar a conexão
+## 7. Teste de conexão
 
-Execute:
+Execução:
 
 ```powershell
 python src/test_connection.py
@@ -295,9 +279,9 @@ Conexão com PostgreSQL realizada com sucesso!
 Conexão encerrada.
 ```
 
-## 8. Executar a extração
+## 8. Extração
 
-Com os arquivos CSV em `dados/` e a conexão configurada, execute:
+Com os arquivos CSV em `dados/` e a conexão configurada, executou-se:
 
 ```powershell
 python src/extract.py
@@ -305,16 +289,9 @@ python src/extract.py
 
 O script utiliza **Pandas** para ler os arquivos e carregá-los no PostgreSQL.
 
-Ao final, serão criadas cinco tabelas no schema `stg_enem`:
+Ao final, foram criadas cinco tabelas no schema `stg_enem`:
 
-```text
-stg_enem
-├── microdados_enem_2019
-├── microdados_enem_2020
-├── microdados_enem_2021
-├── microdados_enem_2022
-└── microdados_enem_2023
-```
+<img width="336" height="111" alt="image" src="https://github.com/user-attachments/assets/7757c99e-f6ae-41a1-b285-96583e7857a8" />
 
 ### Registros carregados
 
@@ -327,9 +304,9 @@ stg_enem
 |      2023 |      3.933.955 |
 | **Total** | **21.678.172** |
 
-## 9. Compilar os dados
+## 9. Compilação os dados
 
-Após a extração, os cinco anos são reunidos em uma única tabela no `dw_enem`.
+Após a extração, os cinco anos foram reunidos em uma única tabela no `dw_enem`.
 
 É utilizado `UNION ALL` para empilhar os registros das diferentes edições sem eliminar possíveis duplicidades.
 
@@ -373,7 +350,7 @@ Resultado esperado:
 21.678.172
 ```
 
-## 10. Validar os dados por ano
+## 10. Validação dos dados por ano
 
 ```sql
 SELECT
@@ -386,14 +363,7 @@ ORDER BY "NU_ANO";
 
 Resultado esperado:
 
-|  Ano | Registros |
-| ---: | --------: |
-| 2019 | 5.095.171 |
-| 2020 | 5.783.109 |
-| 2021 | 3.389.832 |
-| 2022 | 3.476.105 |
-| 2023 | 3.933.955 |
-
+<img width="253" height="122" alt="image" src="https://github.com/user-attachments/assets/d56d2466-63fe-427e-bb51-166707d8c6d9" />
 
 ## 11. Tratamento dos dados
 
@@ -406,7 +376,7 @@ O tratamento inclui:
 * Definição de tipos de dados;
 * Seleção das variáveis relevantes;
 * Exclusão das variáveis consideradas desnecessárias.
-* 
+
 A criação da tabela tratada está documentada em:
 
 ```text
@@ -449,7 +419,7 @@ Resultado esperado:
 
 ## Versionamento dos dados
 
-Os arquivos CSV do ENEM não são armazenados no GitHub devido ao seu grande volume.
+Os arquivos CSV do ENEM não são armazenados no GitHub devido ao seu grande volume (~3 GB de dados - ~600 MB por ano).
 
 O `.gitignore` contém:
 ```gitignore
