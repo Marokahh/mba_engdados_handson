@@ -433,18 +433,57 @@ O arquivo `.env` também não é versionado:
 
 Dessa forma, o repositório mantém apenas **código, scripts, configurações e documentação**, enquanto os dados brutos devem ser obtidos separadamente.
 
-## Próximas etapas
-Com a camada de dados estruturada, as próximas etapas do projeto serão voltadas à análise da abstenção, buscando:
-* Identificar padrões de ausência;
-* Comparar diferentes perfis de participantes;
-* Investigar características socioeconômicas;
-* Avaliar diferenças regionais;
-* Comparar as edições do ENEM;
-* Identificar grupos com maiores taxas de ausência;
-* Transformar os resultados em insights e possíveis práticas para aumentar o comparecimento.
-
-> **Da inscrição à ausência: o objetivo é entender quem não chegou até a prova — e o que os dados podem revelar sobre isso.**
-
 ## Fonte dos dados
 **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira — INEP**
 Os microdados utilizados neste projeto são oficiais e devem ser obtidos diretamente das fontes disponibilizadas pelo INEP (https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/enem).
+
+## Análise Exploratória - Etapa 2
+
+A análise exploratória foi realizada para entender o comportamento da ausência no ENEM entre 2019 e 2023.
+
+Foram analisados:
+
+- **Presença e ausência** por ano;
+- **1º dia x 2º dia** de prova;
+- **Sexo**;
+- **Faixa etária**;
+- **Faixa de renda familiar (Q006)**;
+- **Unidade Federativa (UF)**;
+- **Tipo de escola**.
+
+### Principais insights
+
+- **2020 foi o ano com maior ausência**, chegando a **55,06%** em Ciências da Natureza.
+- A taxa de ausência caiu bastante após 2020, chegando a **31,50% em 2023**.
+- A ausência foi **maior no 1º dia de prova** do que no 2º dia em todos os anos analisados.
+- As taxas de ausência entre **homens e mulheres foram muito próximas**: 37,45% e 37,07%, respectivamente.
+- A **faixa etária apresentou diferenças importantes**. As maiores taxas apareceram nas faixas intermediárias, chegando a **59,07%**.
+- A **renda familiar apresentou uma relação clara com a ausência**: as menores faixas de renda tiveram taxas maiores de ausência.
+- Também foram encontradas **diferenças entre os estados**, com o Amazonas apresentando a maior taxa de ausência (**52,15%**).
+- O **tipo de escola também apresentou diferenças relevantes**, com taxas de ausência de 41,75%, 30,64% e 8,44% entre os grupos analisados.
+
+Esses resultados ajudam a identificar quais grupos apresentam maior ausência e levantam hipóteses para análises futuras, principalmente relacionadas à **renda, idade, localização e perfil escolar**.
+
+### Script da análise
+
+O arquivo `analise_exploratoria.py` reúne as consultas utilizadas nessa etapa.
+
+O script consulta a tabela `dw_enem.microdados_enem_tratado` e apresenta no terminal os principais resultados da análise, como:
+
+- quantidade de presentes e ausentes;
+- taxa de ausência por ano;
+- comparação entre os dias de prova;
+- ausência por sexo;
+- ausência por faixa etária;
+- ausência por renda;
+- ausência por UF;
+- ausência por tipo de escola.
+
+Assim, os resultados podem ser reproduzidos diretamente a partir do banco de dados e posteriormente utilizados para gerar as visualizações.
+
+### Como executar
+
+Com o ambiente virtual ativado, estando dentro de mba_engdados_handson e as dependências instaladas, execute:
+
+```bash
+python src/analise_exploratoria.py
