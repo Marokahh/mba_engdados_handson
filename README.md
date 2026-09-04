@@ -104,26 +104,8 @@ Cada arquivo representa uma edição do exame e contém informações dos partic
 
 O projeto utiliza **Python/Pandas** para a extração e **PostgreSQL** para armazenamento, compilação e tratamento dos dados.
 
-```text
-Microdados ENEM 2019–2023
-            │
-            ▼
-     Python + Pandas
-            │
-            ▼
-       PostgreSQL
-            │
-      ┌─────┴─────┐
-      ▼           ▼
-  stg_enem     dw_enem
-      │           │
-      │      Dados tratados
-      │           │
-      └───────────┘
-            │
-            ▼
-       Análises / BI
-```
+<img width="1324" height="609" alt="arquitetura_tecnica" src="https://github.com/user-attachments/assets/b7c42be3-82c6-40f4-81ed-6569ce5e0fa5" />
+
 
 ### Camadas do banco
 
