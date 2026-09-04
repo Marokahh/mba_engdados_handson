@@ -19,6 +19,7 @@ def executar(cursor, titulo, sql):
     print("\n" + "=" * 80)
     print(titulo)
     print("=" * 80)
+
     cursor.execute(sql)
     colunas = [d[0] for d in cursor.description]
     rows = cursor.fetchall()
@@ -48,17 +49,12 @@ def main():
 
     # 1. PRESENÇA E AUSÊNCIA POR ANO
     # Objetivo:
-    # Identificar como a presença dos participantes na prova de Ciências
-    # da Natureza (CN) se distribui entre 2019 e 2023.
-    #
+    # Identificar como a presença dos participantes na prova de Ciências da Natureza (CN) se distribui entre 2019 e 2023.
     # Código de presença:
     # 0 = ausente
     # 1 = presente
     # 2 = eliminado
-    #
-    # Além da quantidade de participantes, calculamos o percentual de cada
-    # situação dentro de cada ano.
-    #
+    # Além da quantidade de participantes, calculamos o percentual de cada situação dentro de cada ano.
     # Principal output:
     # quantidade e percentual de ausentes, presentes e eliminados por ano.
 
@@ -74,17 +70,10 @@ def main():
     # 2. TAXA DE AUSÊNCIA POR ANO
     # Objetivo:
     # Medir a taxa de ausência na prova de Ciências da Natureza em cada ano.
-    #
-    # Aqui transformamos a quantidade absoluta de ausentes em uma taxa
-    # percentual, permitindo comparar os anos mesmo com diferentes números
-    # de participantes.
-    #
+    # Aqui transformamos a quantidade absoluta de ausentes em uma taxa percentual, permitindo comparar os anos mesmo com diferentes números de participantes.
     # Principal output:
-    # ano, quantidade de ausentes, presentes, total de participantes e
-    # taxa de ausência.
-    #
-    # Essa análise permite identificar anos com aumento ou redução da
-    # ausência e possíveis mudanças de comportamento ao longo do período.
+    # ano, quantidade de ausentes, presentes, total de participantes e taxa de ausência.
+    # Essa análise permite identificar anos com aumento ou redução da ausência e possíveis mudanças de comportamento ao longo do período.
 
     taxa = executar(cursor, "2. TAXA DE AUSENCIA POR ANO - CN", f'''
         SELECT "NU_ANO" AS ano,
@@ -100,10 +89,8 @@ def main():
     # 3. COMPARAÇÃO ENTRE O PRIMEIRO E O SEGUNDO DIA
     # Objetivo:
     # Verificar se o comportamento de ausência muda entre os dias de aplicação do ENEM.
-    #
     # CN representa Ciências da Natureza e ocorre no primeiro dia.
     # CH representa Ciências Humanas e ocorre no segundo dia.
-    #
     # Principal output:
     # taxa de ausência em CN, taxa de ausência em CH e diferença entre elas em pontos percentuais para cada ano.
     # Essa comparação ajuda a identificar se existe maior abandono/ausência em um dos dias de aplicação.
@@ -124,7 +111,6 @@ def main():
     # 4. PERFIL DEMOGRÁFICO — SEXO
     # Objetivo:
     # Investigar se a taxa de ausência apresenta diferenças entre os sexos.
-    #
     # Principal output:
     # total de participantes, ausentes, presentes e taxa de ausência para cada categoria de TP_SEXO.
     # Essa análise permite comparar o comportamento de ausência entre os grupos, considerando a proporção de ausentes dentro de cada grupo.
@@ -142,7 +128,6 @@ def main():
     # 5. PERFIL DEMOGRÁFICO — FAIXA ETÁRIA
     # Objetivo:
     # Investigar a relação entre idade/faixa etária e ausência na prova.
-    #
     # Principal output:
     # total de participantes, ausentes, presentes e taxa de ausência por faixa etária.
     # Essa análise permite identificar faixas etárias com maior ou menor concentração proporcional de ausentes.
@@ -157,17 +142,36 @@ def main():
         ORDER BY "TP_FAIXA_ETARIA";
     ''')
 
-    # 6. PERFIL SOCIOECONÔMICO — RENDA FAMILIAR
+    # 6. PERFIL DEMOGRÁFICO — COR/RAÇA
+    # Objetivo:
+    # Investigar se a taxa de ausência apresenta diferenças entre as categorias de cor/raça declaradas pelos participantes.
+    # Principal output:
+    # total de participantes, ausentes, presentes e taxa de ausência para cada categoria de TP_COR_RACA.
+    # Essa análise permite verificar se existem diferenças no comportamento de ausência entre os grupos de cor/raça.
+
+    cor_raca = executar(cursor, "6. PERFIL DEMOGRAFICO - COR/RAÇA X AUSENCIA", f'''
+        SELECT "TP_COR_RACA" AS cor_raca,
+               COUNT(*) AS total,
+               COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 0) AS ausentes,
+               COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 1) AS presentes,
+               ROUND(
+                   COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 0) * 100.0 / COUNT(*),
+                   2
+               ) AS taxa_ausencia
+        FROM {TABELA}
+        GROUP BY "TP_COR_RACA"
+        ORDER BY "TP_COR_RACA";
+    ''')
+
+    # 7. PERFIL SOCIOECONÔMICO — RENDA FAMILIAR
     # Q006 representa a faixa de renda familiar declarada pelo participante.
-    #
     # Objetivo:
     # Investigar se existe relação entre a faixa de renda familiar e a ocorrência de ausência na prova.
-    #
     # Principal output:
     # total de participantes, ausentes, presentes e taxa de ausência para cada categoria de Q006.
     # Essa análise é importante para verificar se a condição socioeconômica apresenta associação com o comportamento de ausência.
 
-    renda = executar(cursor, "6. PERFIL SOCIOECONOMICO - Q006 X AUSENCIA", f'''
+    renda = executar(cursor, "7. PERFIL SOCIOECONOMICO - Q006 X AUSENCIA", f'''
         SELECT "Q006" AS faixa_renda, COUNT(*) AS total,
                COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 0) AS ausentes,
                COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 1) AS presentes,
@@ -177,15 +181,14 @@ def main():
         ORDER BY CASE WHEN TRIM("Q006") = '' THEN 999 ELSE ASCII(UPPER(TRIM("Q006"))) END;
     ''')
 
-    # 7. PERFIL GEOGRÁFICO — UF
+    # 8. PERFIL GEOGRÁFICO — UF
     # Objetivo:
     # Identificar diferenças na taxa de ausência entre os estados brasileiros.
-    #
     # Principal output:
     # total de participantes, ausentes, presentes e taxa de ausência por UF.
     # O resultado é ordenado pela taxa de ausência, permitindo identificar rapidamente os estados com maiores e menores taxas.
 
-    uf = executar(cursor, "7. GEOGRAFIA - UF X AUSENCIA", f'''
+    uf = executar(cursor, "8. GEOGRAFIA - UF X AUSENCIA", f'''
         SELECT "SG_UF_PROVA" AS uf, COUNT(*) AS total,
                COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 0) AS ausentes,
                COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 1) AS presentes,
@@ -195,15 +198,14 @@ def main():
         ORDER BY taxa_ausencia DESC;
     ''')
 
-    # 8. PERFIL ESCOLAR — TIPO DE ESCOLA
+    # 9. PERFIL ESCOLAR — TIPO DE ESCOLA
     # Objetivo:
     # Investigar se a taxa de ausência varia de acordo com o tipo de escola informado pelo participante.
-    #
     # Principal output:
     # total de participantes, ausentes, presentes e taxa de ausência por categoria de TP_ESCOLA.
     # Essa análise permite comparar o comportamento de ausência entre os diferentes tipos de escola.
 
-    escola = executar(cursor, "8. PERFIL ESCOLAR - TP_ESCOLA X AUSENCIA", f'''
+    escola = executar(cursor, "9. PERFIL ESCOLAR - TP_ESCOLA X AUSENCIA", f'''
         SELECT "TP_ESCOLA" AS tipo_escola, COUNT(*) AS total,
                COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 0) AS ausentes,
                COUNT(*) FILTER (WHERE "TP_PRESENCA_CN" = 1) AS presentes,
@@ -213,11 +215,9 @@ def main():
         ORDER BY "TP_ESCOLA";
     ''')
 
-    # 9. RESUMO DOS PRINCIPAIS ACHADOS
+    # 10. RESUMO DOS PRINCIPAIS ACHADOS
     # Esta seção não realiza uma nova consulta.
-    #
     # Ela utiliza os resultados das análises anteriores para destacar automaticamente os maiores e menores valores encontrados.
-    #
     # Principal output:
     # - ano com maior e menor taxa de ausência;
     # - sexo com maior e menor taxa;
@@ -228,7 +228,7 @@ def main():
     # Esses resultados servem como ponto de partida para as interpretações da Análise Exploratória e para a criação das visualizações.
 
     print("\n" + "=" * 80)
-    print("9. RESUMO DOS PRINCIPAIS ACHADOS")
+    print("10. RESUMO DOS PRINCIPAIS ACHADOS")
     print("=" * 80)
 
     # Identifica o ano com maior e menor taxa de ausência.
