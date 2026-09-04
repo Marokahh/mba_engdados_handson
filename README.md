@@ -104,7 +104,7 @@ Cada arquivo representa uma edição do exame e contém informações dos partic
 
 O projeto utiliza **Python/Pandas** para a extração e **PostgreSQL** para armazenamento, compilação e tratamento dos dados.
 
-<img width="1324" height="609" alt="arquitetura_tecnica" src="https://github.com/user-attachments/assets/b7c42be3-82c6-40f4-81ed-6569ce5e0fa5" />
+<img width="1324" height="609" alt="arquitetura_tecnica_v2" src="https://github.com/user-attachments/assets/6aaab208-557e-489e-996a-aedba6b79d4e" />
 
 
 ### Camadas do banco
