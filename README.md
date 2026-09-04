@@ -425,47 +425,49 @@ A análise exploratória foi realizada para entender o comportamento da ausênci
 
 Foram analisados:
 
-- **Presença e ausência** por ano;
-- **1º dia x 2º dia** de prova;
-- **Sexo**;
-- **Faixa etária**;
-- **Faixa de renda familiar (Q006)**;
-- **Unidade Federativa (UF)**;
-- **Tipo de escola**.
+- Presença e ausência por ano e por dia de prova;
+- Perfil dos participantes, considerando sexo, faixa etária, renda, UF e tipo de escola;
+- Estatísticas descritivas, incluindo média, mediana, desvio padrão, quartis, mínimo e máximo;
+- bDistribuição da faixa etária, incluindo mediana e moda;
+- Matriz de correlação de Spearman entre variáveis ordinais e a ausência;
+- Análise temporal, observando a variação da ausência entre os anos;
+- Identificação de possíveis anomalias nas taxas de ausência.
 
 ### Principais insights
 
 - **2020 foi o ano com maior ausência**, chegando a **55,06%** em Ciências da Natureza.
 - A taxa de ausência caiu bastante após 2020, chegando a **31,50% em 2023**.
 - A ausência foi **maior no 1º dia de prova** do que no 2º dia em todos os anos analisados.
-- As taxas de ausência entre **homens e mulheres foram muito próximas**: 37,45% e 37,07%, respectivamente.
-- A **faixa etária apresentou diferenças importantes**. As maiores taxas apareceram nas faixas intermediárias, chegando a **59,07%**.
+- As taxas de ausência entre **homens e mulheres foram muito próximas**.
+- A **faixa etária apresentou diferenças importantes**. As maiores taxas apareceram nas faixas intermediárias, chegando a **59,07%**. Foram observadas diferenças relevantes por faixa etária, renda, UF e tipo de escola.
 - A **renda familiar apresentou uma relação clara com a ausência**: as menores faixas de renda tiveram taxas maiores de ausência.
 - Também foram encontradas **diferenças entre os estados**, com o Amazonas apresentando a maior taxa de ausência (**52,15%**).
 - O **tipo de escola também apresentou diferenças relevantes**, com taxas de ausência de 41,75%, 30,64% e 8,44% entre os grupos analisados.
+- A análise de correlação indicou associações entre faixa etária, ano de conclusão e ausência.
+- A análise temporal mostrou uma forte variação da ausência em 2020, seguida de redução nos anos posteriores.
+- Não foram identificadas anomalias pelo critério de z-score utilizado.
 
 Esses resultados ajudam a identificar quais grupos apresentam maior ausência e levantam hipóteses para análises futuras, principalmente relacionadas à **renda, idade, localização e perfil escolar**.
 
 ### Script da análise
 
-O arquivo `analise_exploratoria.py` reúne as consultas utilizadas nessa etapa.
-
-O script consulta a tabela `dw_enem.microdados_enem_tratado` e apresenta no terminal os principais resultados da análise, como:
-
-- quantidade de presentes e ausentes;
-- taxa de ausência por ano;
-- comparação entre os dias de prova;
-- ausência por sexo;
-- ausência por faixa etária;
-- ausência por renda;
-- ausência por UF;
-- ausência por tipo de escola.
-
-Assim, os resultados podem ser reproduzidos diretamente a partir do banco de dados e posteriormente utilizados para gerar as visualizações.
+O arquivo **analise_exploratoria.py** reúne as consultas e cálculos da etapa, permitindo reproduzir os resultados diretamente a partir da tabela **dw_enem.microdados_enem_tratado**.
 
 ### Como executar
 
 Com o ambiente virtual ativado, estando dentro de mba_engdados_handson e as dependências instaladas, execute:
 
 ```bash
-python src/analise_exploratoria.py
+python src/analise_exploratoria.py 
+```
+
+## Visualizações em gráficos
+
+![alt text](image.png)
+![alt text](image-1.png)
+![alt text](image-2.png)
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
+![alt text](image-6.png)
+![alt text](image-7.png)
