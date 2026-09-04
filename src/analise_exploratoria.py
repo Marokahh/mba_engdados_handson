@@ -1,6 +1,9 @@
 from pathlib import Path
 import sys
 
+import pandas as pd
+from sqlalchemy import create_engine
+
 # Localiza a pasta raiz do projeto para permitir o acesso aos módulos do src.
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -46,6 +49,11 @@ def executar(cursor, titulo, sql):
 def main():
     conn = get_connection()
     cursor = conn.cursor()
+
+    engine = create_engine(
+        "postgresql+psycopg2://",
+        creator=get_connection
+    )
 
     # 1. PRESENÇA E AUSÊNCIA POR ANO
     # Objetivo:
@@ -215,7 +223,313 @@ def main():
         ORDER BY "TP_ESCOLA";
     ''')
 
-    # 10. RESUMO DOS PRINCIPAIS ACHADOS
+    # 10. ESTATÍSTICA DESCRITIVA — NÚMERO DE PESSOAS NA RESIDÊNCIA
+    # Objetivo:
+    # Complementar as análises de frequência e percentual com estatísticas descritivas de uma variável numérica relacionada ao perfil populacional.
+    # A variável Q005 representa a quantidade de pessoas que moram na residência do participante.
+    # São calculadas medidas de tendência central (média e mediana), medidas de dispersão (desvio padrão) e medidas de posição (primeiro e terceiro quartis), além dos valores mínimo e máximo.
+    # A análise é separada entre participantes presentes e ausentes na prova de Ciências da Natureza.
+    # Principal output:
+    # estatísticas descritivas da quantidade de moradores da residência por situação de presença.
+    # Essa análise permite complementar o perfil socioeconômico e familiar dos participantes, verificando possíveis diferenças entre os grupos de presentes e ausentes.
+
+    q005_estatistica = executar(
+        cursor,
+        "10. ESTATISTICA DESCRITIVA - NUMERO DE PESSOAS NA RESIDENCIA",
+        f'''
+            SELECT
+                CASE
+                    WHEN "TP_PRESENCA_CN" = 0 THEN 'Ausente'
+                    WHEN "TP_PRESENCA_CN" = 1 THEN 'Presente'
+                    WHEN "TP_PRESENCA_CN" = 2 THEN 'Eliminado'
+                    ELSE 'Outro'
+                END AS situacao,
+
+                COUNT("Q005") AS quantidade,
+
+                ROUND(AVG("Q005")::numeric, 2) AS media,
+
+                ROUND(
+                    PERCENTILE_CONT(0.50)
+                    WITHIN GROUP (ORDER BY "Q005")::numeric,
+                    2
+                ) AS mediana,
+
+                ROUND(
+                    STDDEV("Q005")::numeric,
+                    2
+                ) AS desvio_padrao,
+
+                MIN("Q005") AS minimo,
+
+                MAX("Q005") AS maximo,
+
+                ROUND(
+                    PERCENTILE_CONT(0.25)
+                    WITHIN GROUP (ORDER BY "Q005")::numeric,
+                    2
+                ) AS primeiro_quartil,
+
+                ROUND(
+                    PERCENTILE_CONT(0.75)
+                    WITHIN GROUP (ORDER BY "Q005")::numeric,
+                    2
+                ) AS terceiro_quartil
+
+            FROM {TABELA}
+
+            WHERE "Q005" IS NOT NULL
+
+            GROUP BY
+                CASE
+                    WHEN "TP_PRESENCA_CN" = 0 THEN 'Ausente'
+                    WHEN "TP_PRESENCA_CN" = 1 THEN 'Presente'
+                    WHEN "TP_PRESENCA_CN" = 2 THEN 'Eliminado'
+                    ELSE 'Outro'
+                END
+
+            ORDER BY situacao;
+        '''
+    )
+
+    # 11. ANÁLISE ESTATÍSTICA - DISTRIBUIÇÃO DA FAIXA ETÁRIA
+    # Objetivo:
+    # Analisar como os participantes estão distribuídos entre as diferentes faixas etárias do ENEM, considerando a população total da base.
+    # A variável TP_FAIXA_ETARIA é uma variável ordinal, portanto não é adequado calcular média ou desvio padrão diretamente sobre seus códigos.
+    # Nesta análise são apresentadas:
+    # - quantidade de participantes em cada faixa etária;
+    # - percentual de participação de cada faixa;
+    # - percentual acumulado;
+    # - faixa etária mais frequente (moda);
+    # - faixa etária mediana.
+    # Principal output:
+    # distribuição da população participante por faixa etária.
+    # Essa análise complementa a análise de ausência por idade, permitindo primeiro compreender a composição etária da população analisada.
+
+    distribuicao_idade = executar(
+        cursor,
+        "11. ANÁLISE ESTATÍSTICA - DISTRIBUICAO DA FAIXA ETARIA",
+        f'''
+            SELECT
+                "TP_FAIXA_ETARIA" AS faixa_etaria,
+                COUNT(*) AS quantidade,
+                ROUND(
+                    COUNT(*) * 100.0 /
+                    SUM(COUNT(*)) OVER (),
+                    2
+                ) AS percentual,
+                ROUND(
+                    SUM(COUNT(*)) OVER (
+                        ORDER BY "TP_FAIXA_ETARIA"
+                    ) * 100.0 /
+                    SUM(COUNT(*)) OVER (),
+                    2
+                ) AS percentual_acumulado
+            FROM {TABELA}
+            WHERE "TP_FAIXA_ETARIA" IS NOT NULL
+            GROUP BY "TP_FAIXA_ETARIA"
+            ORDER BY "TP_FAIXA_ETARIA";
+        '''
+    )
+
+    # Identifica a faixa etária mais frequente (moda).
+    if distribuicao_idade:
+        faixa_moda = max(
+            distribuicao_idade,
+            key=lambda x: int(x[1])
+        )
+
+        print(
+            f"- Faixa etária mais frequente (moda): "
+            f"{faixa_moda[0]} ({faixa_moda[1]} participantes; "
+            f"{faixa_moda[2]}%)."
+        )
+
+    # 11.1 MEDIANA DA FAIXA ETÁRIA
+    # Como TP_FAIXA_ETARIA é uma variável ordinal, a mediana representa
+    # a faixa etária que ocupa a posição central da distribuição.
+
+    print("\n" + "=" * 80)
+    print("11.1 ANALISE ESTATISTICA - MEDIANA DA FAIXA ETARIA")
+    print("=" * 80)
+
+    cursor.execute(f'''
+        SELECT
+            PERCENTILE_DISC(0.50)
+            WITHIN GROUP (
+                ORDER BY "TP_FAIXA_ETARIA"
+            ) AS faixa_etaria_mediana
+        FROM {TABELA}
+        WHERE "TP_FAIXA_ETARIA" IS NOT NULL;
+    ''')
+
+    resultado = cursor.fetchone()
+
+    if resultado:
+        print(f"\nFaixa etária mediana: {resultado[0]}")
+
+    # 12. MATRIZ DE CORRELAÇÃO
+    # Analisa a relação linear entre as variáveis numéricas/ordinais selecionadas e o indicador de ausência.
+    # O indicador "ausencia" recebe:
+    # 1 = ausente
+    # 0 = presente
+    # A correlação utilizada é a de Spearman, mais adequada para variáveis ordinais como faixa etária e ano de conclusão.
+
+    print("\n" + "=" * 80)
+    print("12. MATRIZ DE CORRELACAO")
+    print("=" * 80)
+
+    sql = f'''
+        SELECT
+            "TP_FAIXA_ETARIA" AS faixa_etaria,
+            "TP_ANO_CONCLUIU" AS ano_conclusao,
+            "Q005" AS pessoas_domicilio,
+            CASE
+                WHEN "TP_PRESENCA_CN" = 0 THEN 1
+                WHEN "TP_PRESENCA_CN" = 1 THEN 0
+                ELSE NULL
+            END AS ausencia
+        FROM {TABELA}
+        WHERE "TP_FAIXA_ETARIA" IS NOT NULL
+          AND "TP_ANO_CONCLUIU" IS NOT NULL
+          AND "Q005" IS NOT NULL
+          AND "TP_PRESENCA_CN" IN (0, 1);
+    '''
+
+    df = pd.read_sql_query(sql, engine)
+
+    matriz = df.corr(
+        method="spearman",
+        numeric_only=True
+    )
+
+    matriz = matriz.rename(
+        index={
+            "faixa_etaria": "Faixa etária",
+            "ano_conclusao": "Ano de conclusão",
+            "pessoas_domicilio": "Pessoas no domicílio",
+            "ausencia": "Ausência"
+        },
+        columns={
+            "faixa_etaria": "Faixa etária",
+            "ano_conclusao": "Ano de conclusão",
+            "pessoas_domicilio": "Pessoas no domicílio",
+            "ausencia": "Ausência"
+        }
+    )
+
+    print("\nMatriz de correlação de Spearman:")
+    print(matriz.round(3).to_string())
+
+    # 13. ANALISE TEMPORAL - VARIACAO DA AUSENCIA AO LONGO DOS ANOS
+    # Verifica como a taxa de ausência varia entre 2019 e 2023.
+    # Como a base possui dados anuais, esta análise representa uma comparação temporal entre os anos, e não uma sazonalidade mensal ou semanal.
+
+    executar(
+        cursor,
+        "13. ANALISE TEMPORAL - VARIACAO DA AUSENCIA",
+        f'''
+            SELECT
+                "NU_ANO" AS ano,
+
+                COUNT(*) FILTER (
+                    WHERE "TP_PRESENCA_CN" = 0
+                ) AS ausentes,
+
+                COUNT(*) AS total,
+
+                ROUND(
+                    COUNT(*) FILTER (
+                        WHERE "TP_PRESENCA_CN" = 0
+                    ) * 100.0 / COUNT(*),
+                    2
+                ) AS taxa_ausencia
+
+            FROM {TABELA}
+
+            GROUP BY "NU_ANO"
+
+            ORDER BY "NU_ANO";
+        '''
+    )
+
+    # 14. IDENTIFICACAO DE ANOMALIAS
+    # Identifica anos cuja taxa de ausência apresenta comportamento muito diferente do padrão observado no período analisado.
+    # Utilizamos o Z-score:
+    # Z = (valor - média) / desvio padrão
+    # Valores com |Z| >= 2 são classificados como possíveis anomalias.
+
+    sql_anomalias = f'''
+        WITH taxas AS (
+            SELECT
+                "NU_ANO" AS ano,
+                COUNT(*) FILTER (
+                    WHERE "TP_PRESENCA_CN" = 0
+                ) * 100.0 / COUNT(*) AS taxa_ausencia
+            FROM {TABELA}
+            GROUP BY "NU_ANO"
+        ),
+
+        estatisticas AS (
+            SELECT
+                AVG(taxa_ausencia) AS media,
+                STDDEV(taxa_ausencia) AS desvio_padrao
+            FROM taxas
+        )
+
+        SELECT
+            t.ano,
+            ROUND(t.taxa_ausencia::numeric, 2) AS taxa_ausencia,
+            ROUND(e.media::numeric, 2) AS media_periodo,
+            ROUND(e.desvio_padrao::numeric, 2) AS desvio_padrao,
+            ROUND(
+                ((t.taxa_ausencia - e.media) / e.desvio_padrao)::numeric,
+                2
+            ) AS z_score,
+
+            CASE
+                WHEN ABS(
+                    (t.taxa_ausencia - e.media) / e.desvio_padrao
+                ) >= 2
+                THEN 'Possível anomalia'
+                ELSE 'Dentro do padrão'
+            END AS classificacao
+
+        FROM taxas t
+        CROSS JOIN estatisticas e
+
+        ORDER BY t.ano;
+    '''
+
+    anomalias = executar(
+        cursor,
+        "14. IDENTIFICACAO DE ANOMALIAS - TAXA DE AUSENCIA",
+        sql_anomalias
+    )
+
+    if anomalias:
+        print("\nResumo das anomalias:")
+
+        encontrou_anomalia = False
+
+        for linha in anomalias:
+            ano = linha[0]
+            taxa_ano = linha[1]
+            z_score = linha[4]
+            classificacao = linha[5]
+
+            if classificacao == "Possível anomalia":
+                encontrou_anomalia = True
+
+                print(
+                    f"- {ano}: taxa de ausência de {taxa_ano}% "
+                    f"(Z-score = {z_score})"
+                )
+
+        if not encontrou_anomalia:
+            print("- Nenhuma possível anomalia foi identificada.")
+
+    # 15. RESUMO DOS PRINCIPAIS ACHADOS
     # Esta seção não realiza uma nova consulta.
     # Ela utiliza os resultados das análises anteriores para destacar automaticamente os maiores e menores valores encontrados.
     # Principal output:
@@ -228,7 +542,7 @@ def main():
     # Esses resultados servem como ponto de partida para as interpretações da Análise Exploratória e para a criação das visualizações.
 
     print("\n" + "=" * 80)
-    print("10. RESUMO DOS PRINCIPAIS ACHADOS")
+    print("15. RESUMO DOS PRINCIPAIS ACHADOS")
     print("=" * 80)
 
     # Identifica o ano com maior e menor taxa de ausência.
@@ -273,6 +587,8 @@ def main():
     # Encerra o cursor e a conexão com o banco.
     cursor.close()
     conn.close()
+    engine.dispose()
+
     print("\nAnalise exploratoria concluida com sucesso.")
 
 # Executa a análise somente quando este arquivo for executado diretamente.
