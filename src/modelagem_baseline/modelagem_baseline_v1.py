@@ -222,8 +222,8 @@ if __name__ == "__main__":
 
 # Rodei no run
 
-# O que esse primeiro modelo faz?
-# "Vou olhar qual é a classe mais comum na base e vou prever essa classe para todo mundo."
+# O que esse primeiro modelo faz? Modelo orientado à classe Presente
+# V1: avaliação inicialmente estruturada com Presente como classe positiva.
 # Então ele não usa idade, renda, UF, escola etc. Ainda não é o Machine Learning de verdade. É a nossa referência.
 # As métricas que vamos guardar para a próxima etapa são: Accuracy, Precision, Recall, F1-score, Balanced Accuracy, Matriz de confusão
 # E depois vamos fazer algo importante: Random Forest e XGBoost terão que ser avaliados com as mesmas métricas, para conseguirmos justificar no trabalho qual modelo teve melhor desempenho.
