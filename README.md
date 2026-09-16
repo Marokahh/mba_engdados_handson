@@ -22,11 +22,11 @@ Todos os anos, milhões de estudantes realizam sua inscrição para participar d
 
 Por trás de cada ausência existe um estudante que, por algum motivo, não chegou a realizar o exame. Compreender quem são esses candidatos e quais características estão presentes nesse grupo pode ajudar a entender melhor o fenômeno da abstenção.
 
-Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**, referentes às edições do ENEM entre **2020 e 2025**.
+Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**, referentes às edições do ENEM entre **2019 e 2023**.
 
 ## O problema
 
-Todos os anos, milhões de pessoas se inscrevem no ENEM pois muitos estudantes enxergam o exame não é apenas como uma avaliação, mas como a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
+Todos os anos, milhões de pessoas se inscrevem no ENEM, pois muitos estudantes enxergam o exame não apenas como uma avaliação, mas como a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
 
 Porém uma parte dessas pessoas se inscreve e, por algum motivo, não chega a fazer a prova. E o que acontece depois?
 
@@ -72,7 +72,7 @@ A partir dessa questão, a análise buscará responder:
 
 ## Objetivo
 
-Identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
+Identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e gerar insights que possam contribuir para futuras ações de incentivo ao comparecimento ao exame.
 
 ## Dados utilizados
 
@@ -132,27 +132,39 @@ Concentra os dados compilados e tratados que serão utilizados nas análises.
 | `requirements.txt`       | Dependências Python                           |
 | `.gitignore`             | Define arquivos que não devem ser versionados |
 
-## Tecnologias
 
-* **Python 3.11**
-* **Pandas**
-* **PostgreSQL**
-* **psycopg2**
-* **python-dotenv**
-* **DBeaver**
-* **SQL**
-* **Git / GitHub**
+### Tecnologias
+
+- **Python 3.11**
+- **PostgreSQL**
+- **DBeaver**
+- **Git / GitHub**
+- **SQL**
+
+### Bibliotecas Python
+
+As bibliotecas utilizadas no projeto estão centralizadas no arquivo `requirements.txt`:
+
+- **Pandas** — leitura, tratamento e análise dos dados;
+- **psycopg2** — conexão entre Python e PostgreSQL;
+- **python-dotenv** — carregamento das variáveis de ambiente do `.env`;
+- **scikit-learn** — preparação dos dados, divisão treino/teste e métricas dos modelos;
+- **XGBoost** — treinamento do modelo XGBoost;
+- **Matplotlib** — geração das visualizações;
+- **Seaborn** — geração das visualizações estatísticas.
 
 # Como executar
 
 ## 1. Pré-requisitos
 
-Instalou-se:
+Antes de executar o projeto, é necessário ter instalado:
 
-* Python 3.11 ou superior;
-* PostgreSQL;
-* DBeaver;
-* Git.
+- Python 3.11 ou superior;
+- PostgreSQL;
+- DBeaver;
+- Git.
+
+As bibliotecas Python são instaladas posteriormente pelo arquivo `requirements.txt`.
 
 ## 2. Baixar os microdados
 
@@ -286,7 +298,7 @@ Ao final, foram criadas cinco tabelas no schema `stg_enem`:
 |      2023 |      3.933.955 |
 | **Total** | **21.678.172** |
 
-## 9. Compilação os dados
+## 9. Compilação dos dados
 
 Após a extração, os cinco anos foram reunidos em uma única tabela no `dw_enem`.
 
@@ -433,21 +445,80 @@ Foram analisados:
 - Análise temporal, observando a variação da ausência entre os anos;
 - Identificação de possíveis anomalias nas taxas de ausência.
 
+### O que descobrimos?
+
+A análise exploratória mostrou que a ausência no ENEM não ocorre de forma uniforme entre os participantes. Foram observadas diferenças principalmente relacionadas ao ano da prova, dia de aplicação, renda, idade, localização e tipo de escola.
+
+Entre os principais achados, destacam-se:
+
+- 2020 apresentou uma das maiores taxas de ausência;
+- o 1º dia de prova apresentou maior ausência que o 2º dia;
+- participantes das menores faixas de renda apresentaram maiores taxas de ausência;
+- foram observadas diferenças entre faixas etárias e unidades federativas;
+- o tipo de escola apresentou diferenças nas taxas de ausência;
+- as diferenças entre homens e mulheres foram menores em comparação com outros fatores analisados.
+
+Esses resultados orientaram a seleção das variáveis utilizadas na etapa de modelagem.
+
 ### Principais insights
 
-- **2020 foi o ano com maior ausência**, chegando a **55,06%** em Ciências da Natureza.
-- A taxa de ausência caiu bastante após 2020, chegando a **31,50% em 2023**.
-- A ausência foi **maior no 1º dia de prova** do que no 2º dia em todos os anos analisados.
-- As taxas de ausência entre **homens e mulheres foram muito próximas**.
-- A **faixa etária apresentou diferenças importantes**. As maiores taxas apareceram nas faixas intermediárias, chegando a **59,07%**. Foram observadas diferenças relevantes por faixa etária, renda, UF e tipo de escola.
-- A **renda familiar apresentou uma relação clara com a ausência**: as menores faixas de renda tiveram taxas maiores de ausência.
-- Também foram encontradas **diferenças entre os estados**, com o Amazonas apresentando a maior taxa de ausência (**52,15%**).
-- O **tipo de escola também apresentou diferenças relevantes**, com taxas de ausência de 41,75%, 30,64% e 8,44% entre os grupos analisados.
-- A análise de correlação indicou associações entre faixa etária, ano de conclusão e ausência.
-- A análise temporal mostrou uma forte variação da ausência em 2020, seguida de redução nos anos posteriores.
-- Não foram identificadas anomalias pelo critério de z-score utilizado.
+1. A ausência foi maior em 2020
 
-Esses resultados ajudam a identificar quais grupos apresentam maior ausência e levantam hipóteses para análises futuras, principalmente relacionadas à **renda, idade, localização e perfil escolar**.
+    - Achado: 2020 apresentou a maior taxa de ausência entre os anos analisados.
+    - Evidência: A ausência chegou a 55,06% em Ciências da Natureza em 2020, enquanto em 2023 a taxa caiu para 31,50%.
+    - Possível interpretação: A concentração das maiores taxas em 2020 indica uma forte alteração no comportamento de comparecimento nesse período.
+    - Limitação: Os dados analisados mostram a relação temporal, mas não permitem determinar sozinhos quais fatores causaram essa diferença.
+    - Hipótese para modelagem: H1: o ano da edição pode estar relacionado à probabilidade de ausência.
+
+2. O primeiro dia de prova apresentou maior ausência
+    - Achado: A taxa de ausência foi maior no 1º dia de prova do que no 2º dia em todos os anos analisados.
+    - Evidência: O padrão foi observado de forma consistente entre 2019 e 2023.
+    - Possível interpretação: O comparecimento pode variar de acordo com o dia de aplicação, indicando que o momento da prova pode estar relacionado à ausência.
+    - Limitação: A análise não permite identificar o motivo individual da ausência em cada dia.
+    - Hipótese para modelagem: H2: características relacionadas à aplicação da prova podem contribuir para identificar participantes com maior probabilidade de ausência.
+
+3. A renda apresentou relação com a ausência
+    - Achado: Participantes das menores faixas de renda apresentaram maiores taxas de ausência.
+    - Evidência: As taxas de ausência foram maiores nos grupos de menor renda familiar.
+    - Possível interpretação: A diferença pode estar relacionada a dificuldades socioeconômicas que afetam a possibilidade de comparecimento ao exame.
+    - Limitação: A associação observada não permite afirmar que a renda seja a causa da ausência.
+    - Hipótese para modelagem: H3: características socioeconômicas podem contribuir para a identificação de participantes ausentes.
+
+4. A idade apresentou diferenças relevantes
+    - Achado: A taxa de ausência variou entre as diferentes faixas etárias.
+    - Evidência: As maiores taxas observadas chegaram a 59,07% em faixas intermediárias.
+    - Possível interpretação: Diferentes momentos da trajetória escolar podem estar associados a diferentes padrões de comparecimento.
+    - Limitação: A análise não permite determinar por que determinadas faixas apresentam maior ausência.
+    - Hipótese para modelagem: H4: características relacionadas à idade podem contribuir para a identificação da ausência.
+
+5. Existem diferenças entre os estados
+    - Achado: A ausência não apresentou o mesmo comportamento em todas as unidades federativas.
+    - Evidência: O Amazonas apresentou taxa de ausência de 52,15%, destacando-se entre os estados analisados.
+    - Possível interpretação: Diferenças regionais podem estar relacionadas às características sociais, econômicas e de acesso ao local de aplicação.
+    - Limitação: A análise estadual não permite identificar quais fatores específicos explicam as diferenças observadas.
+    - Hipótese para modelagem: H5: características relacionadas à localização podem contribuir para a identificação de participantes ausentes.
+
+6. O tipo de escola apresentou diferenças de ausência
+    - Achado: As taxas de ausência variaram entre os grupos de tipo de escola.
+    - Evidência: Foram observadas taxas de 41,75%, 30,64% e 8,44% entre os grupos analisados.
+    - Possível interpretação: O contexto escolar pode estar relacionado às condições de participação no exame.
+    - Limitação: A diferença entre os grupos não permite afirmar que o tipo de escola seja diretamente responsável pela ausência.
+    - Hipótese para modelagem: H6: características relacionadas à escola podem contribuir para a identificação da ausência.
+
+7. Sexo apresentou pouca diferença
+    - Achado: As taxas de ausência entre homens e mulheres foram próximas.
+    - Evidência: Não foram observadas diferenças expressivas entre os dois grupos.
+    - Possível interpretação: O sexo, isoladamente, parece apresentar menor diferença na taxa de ausência quando comparado a outras características analisadas.
+    - Limitação: Uma variável isolada não permite avaliar possíveis interações com fatores socioeconômicos, escolares ou regionais.
+    - Hipótese para modelagem: H7: o sexo pode contribuir para o modelo quando analisado em conjunto com outras características.
+  
+### Síntese da Análise Exploratória
+
+Os resultados indicam que a ausência no ENEM não se distribui de maneira uniforme entre os participantes.
+
+Foram identificadas diferenças relacionadas principalmente a ano, renda, idade, localização e tipo de escola, enquanto as diferenças entre homens e mulheres foram menores.
+
+Esses achados ajudaram a direcionar a etapa de modelagem, na qual essas características foram utilizadas como variáveis preditoras para verificar se é possível identificar participantes com maior probabilidade de ausência.
 
 ### Script da análise
 
@@ -462,12 +533,105 @@ python src/analise_exploratoria.py
 ```
 
 ## Visualizações em gráficos
+<img width="893" height="489" alt="image" src="https://github.com/user-attachments/assets/776e2c3c-1753-457b-9676-e14ff145887e" />
+<img width="941" height="536" alt="image" src="https://github.com/user-attachments/assets/6415bdbc-20b7-43ba-ad29-e02de985ae5c" />
+<img width="641" height="490" alt="image" src="https://github.com/user-attachments/assets/7c615cbc-3b3f-4cf4-a240-4245c3b59172" />
+<img width="989" height="837" alt="image" src="https://github.com/user-attachments/assets/334dd98e-6da5-4825-b476-a70db29703a7" />
+<img width="990" height="540" alt="image" src="https://github.com/user-attachments/assets/1244751f-00cc-43b0-a5d8-cfcf2a790ef5" />
+<img width="1191" height="886" alt="image" src="https://github.com/user-attachments/assets/5ab385bb-b5d4-474a-a491-295d17ce56ca" />
+<img width="988" height="987" alt="image" src="https://github.com/user-attachments/assets/837cd3fc-4ad8-4663-946f-002c4b581852" />
+<img width="738" height="486" alt="image" src="https://github.com/user-attachments/assets/ba98d425-2ba3-4d9c-8dd8-b61febdf5b8f" />
 
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
-![alt text](image-7.png)
+# Modelagem - Etapa 3
+
+## 1. Objetivo da modelagem
+
+Nesta etapa, o objetivo foi desenvolver modelos capazes de identificar participantes que não compareceram ao ENEM.
+
+A variável utilizada como alvo foi `TP_PRESENCA_CN`, considerando:
+
+- `0 = Presente`
+- `1 = Ausente`
+
+A classe de maior interesse é **Ausente**, pois a proposta do projeto é identificar padrões relacionados à ausência dos participantes.
+
+## 2. Estratégia de modelagem
+Foram utilizados três tipos de abordagem:
+- **Baseline:** modelo de referência, que sempre prevê a classe mais frequente.
+- **Random Forest:** modelo baseado em várias árvores de decisão, utilizado para identificar relações entre as características dos participantes e a ausência.
+- **XGBoost:** modelo de árvores com treinamento sequencial, utilizado como segunda abordagem de Machine Learning.
+
+Foram desenvolvidas duas versões dos modelos de Machine Learning:
+- **V1:** amostra de 200.000 registros.
+- **V2:** amostra de 2.100.000 registros, aproximadamente 10% da base.
+
+A divisão dos dados foi feita em:
+- 80% para treinamento;
+- 20% para teste;
+- divisão estratificada;
+- `random_state = 42`.
+
+As variáveis utilizadas foram:
+- `TP_SEXO`
+- `TP_COR_RACA`
+- `TP_ESTADO_CIVIL`
+- `TP_NACIONALIDADE`
+- `TP_ESCOLA`
+- `TP_ENSINO`
+- `IN_TREINEIRO`
+- `TP_ST_CONCLUSAO`
+- `TP_ANO_CONCLUIU`
+- `TP_LOCALIZACAO_ESC`
+- `TP_DEPENDENCIA_ADM_ESC`
+- `TP_SIT_FUNC_ESC`
+
+
+## 3. Decisões tomadas
+
+* Uso do Baseline: O Baseline foi utilizado como referência para verificar o quanto os modelos de Machine Learning conseguem avançar em relação a uma estratégia simples de previsão.
+* Uso de duas amostras: A V1 utiliza 200.000 registros para permitir uma primeira avaliação dos modelos com menor custo computacional.
+* Na V2, a amostra foi aumentada para 2.100.000 registros para verificar se o aumento da quantidade de dados produziria uma melhora relevante no desempenho.
+* Foco na classe Ausente.
+* Como o objetivo do projeto é identificar participantes ausentes, foram analisadas principalmente as métricas:
+    - **Precision:** entre as previsões de ausência, quantas realmente eram ausentes;
+    - **Recall:** entre os participantes realmente ausentes, quantos foram identificados;
+    - **F1-score:** equilíbrio entre Precision e Recall;
+    - **Balanced Accuracy:** desempenho considerando as duas classes.
+
+## 4. Resultados
+
+| Modelo | Registros | Accuracy | Precision | Recall | F1-score | Balanced Accuracy |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline | 21.669.596 | 62,77% | 0,00% | 0,00% | 0,00% | 50,00% |
+| Random Forest V1 | 200.000 | 63,50% | 85,31% | 63,61% | 72,88% | 63,36% |
+| Random Forest V2 | 2.100.000 | 62,56% | 84,85% | 61,54% | 71,34% | 63,63% |
+| XGBoost V1 | 200.000 | 63,41% | 85,73% | 63,04% | 72,65% | 63,86% |
+| XGBoost V2 | 2.100.000 | 62,39% | 84,97% | 61,15% | 71,12% | 63,70% |
+
+> As métricas de Precision, Recall e F1-score consideram **Ausente como classe positiva (`1`)**.
+
+
+## 5. Insights dos resultados
+
+Os resultados mostram que os modelos de Machine Learning apresentaram desempenho superior ao Baseline principalmente na capacidade de identificar a classe **Ausente**.
+
+O Baseline apresenta Accuracy de **62,77%**, porém não identifica os participantes ausentes. Isso acontece porque sua estratégia consiste em sempre prever a classe mais frequente.
+
+Nos modelos de Machine Learning, o **Recall da classe Ausente ficou próximo de 61% a 64%**, indicando que uma parcela relevante dos participantes que realmente estavam ausentes foi identificada pelo modelo.
+
+Outro ponto observado é que o aumento da amostra de **200 mil para 2,1 milhões de registros não trouxe ganho direto de Accuracy, Recall ou F1-score**. Tanto Random Forest quanto XGBoost apresentaram resultados ligeiramente menores na V2 nessas métricas.
+
+Por outro lado, a **Balanced Accuracy permaneceu próxima de 64% nas quatro versões**, indicando que o desempenho entre as classes ficou relativamente estável mesmo com o aumento da quantidade de dados.
+
+
+## 6. Conclusão
+
+A modelagem mostrou que as características disponíveis dos participantes possuem capacidade de contribuir para a identificação de ausências no ENEM.
+
+Os modelos de Random Forest e XGBoost conseguiram identificar participantes ausentes, apresentando Recall acima de 60%, enquanto o Baseline não identifica essa classe.
+
+O aumento da quantidade de dados utilizado na V2 não resultou em uma melhora direta nas principais métricas. Esse resultado indica que, para as variáveis utilizadas nesta etapa, aumentar a quantidade de registros por si só não foi suficiente para melhorar o desempenho.
+
+A partir desses resultados, novas etapas podem explorar outras variáveis e ajustes dos modelos para buscar uma melhor identificação dos participantes ausentes.
+
+

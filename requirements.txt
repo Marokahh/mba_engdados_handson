@@ -6,3 +6,4 @@ pathlib
 SQLAlchemy
 scikit-learn
 xgboost
+seaborn
