@@ -22,11 +22,11 @@ Todos os anos, milhões de estudantes realizam sua inscrição para participar d
 
 Por trás de cada ausência existe um estudante que, por algum motivo, não chegou a realizar o exame. Compreender quem são esses candidatos e quais características estão presentes nesse grupo pode ajudar a entender melhor o fenômeno da abstenção.
 
-Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**, referentes às edições do ENEM entre **2020 e 2025**.
+Para isso, o projeto utilizará dados oficiais disponibilizados pelo **Instituto Nacional de Estudos e Pesquisas Educacionais Anísio Teixeira (INEP)**, referentes às edições do ENEM entre **2019 e 2023**.
 
 ## O problema
 
-Todos os anos, milhões de pessoas se inscrevem no ENEM pois muitos estudantes enxergam o exame não é apenas como uma avaliação, mas como a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
+Todos os anos, milhões de pessoas se inscrevem no ENEM, pois muitos estudantes enxergam o exame não apenas como uma avaliação, mas como a porta de entrada para uma universidade, para uma profissão e para novas oportunidades.
 
 Porém uma parte dessas pessoas se inscreve e, por algum motivo, não chega a fazer a prova. E o que acontece depois?
 
@@ -72,7 +72,7 @@ A partir dessa questão, a análise buscará responder:
 
 ## Objetivo
 
-Identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e utilizar esses insights para **propor práticas que contribuam para o aumento do comparecimento ao exame**.
+Identificar padrões e características relacionadas à ausência dos participantes, buscando compreender os diferentes perfis envolvidos e gerar insights que possam contribuir para futuras ações de incentivo ao comparecimento ao exame.
 
 ## Dados utilizados
 
@@ -298,7 +298,7 @@ Ao final, foram criadas cinco tabelas no schema `stg_enem`:
 |      2023 |      3.933.955 |
 | **Total** | **21.678.172** |
 
-## 9. Compilação os dados
+## 9. Compilação dos dados
 
 Após a extração, os cinco anos foram reunidos em uma única tabela no `dw_enem`.
 
@@ -445,21 +445,80 @@ Foram analisados:
 - Análise temporal, observando a variação da ausência entre os anos;
 - Identificação de possíveis anomalias nas taxas de ausência.
 
+### O que descobrimos?
+
+A análise exploratória mostrou que a ausência no ENEM não ocorre de forma uniforme entre os participantes. Foram observadas diferenças principalmente relacionadas ao ano da prova, dia de aplicação, renda, idade, localização e tipo de escola.
+
+Entre os principais achados, destacam-se:
+
+- 2020 apresentou uma das maiores taxas de ausência;
+- o 1º dia de prova apresentou maior ausência que o 2º dia;
+- participantes das menores faixas de renda apresentaram maiores taxas de ausência;
+- foram observadas diferenças entre faixas etárias e unidades federativas;
+- o tipo de escola apresentou diferenças nas taxas de ausência;
+- as diferenças entre homens e mulheres foram menores em comparação com outros fatores analisados.
+
+Esses resultados orientaram a seleção das variáveis utilizadas na etapa de modelagem.
+
 ### Principais insights
 
-- **2020 foi o ano com maior ausência**, chegando a **55,06%** em Ciências da Natureza.
-- A taxa de ausência caiu bastante após 2020, chegando a **31,50% em 2023**.
-- A ausência foi **maior no 1º dia de prova** do que no 2º dia em todos os anos analisados.
-- As taxas de ausência entre **homens e mulheres foram muito próximas**.
-- A **faixa etária apresentou diferenças importantes**. As maiores taxas apareceram nas faixas intermediárias, chegando a **59,07%**. Foram observadas diferenças relevantes por faixa etária, renda, UF e tipo de escola.
-- A **renda familiar apresentou uma relação clara com a ausência**: as menores faixas de renda tiveram taxas maiores de ausência.
-- Também foram encontradas **diferenças entre os estados**, com o Amazonas apresentando a maior taxa de ausência (**52,15%**).
-- O **tipo de escola também apresentou diferenças relevantes**, com taxas de ausência de 41,75%, 30,64% e 8,44% entre os grupos analisados.
-- A análise de correlação indicou associações entre faixa etária, ano de conclusão e ausência.
-- A análise temporal mostrou uma forte variação da ausência em 2020, seguida de redução nos anos posteriores.
-- Não foram identificadas anomalias pelo critério de z-score utilizado.
+1. A ausência foi maior em 2020
 
-Esses resultados ajudam a identificar quais grupos apresentam maior ausência e levantam hipóteses para análises futuras, principalmente relacionadas à **renda, idade, localização e perfil escolar**.
+    - Achado: 2020 apresentou a maior taxa de ausência entre os anos analisados.
+    - Evidência: A ausência chegou a 55,06% em Ciências da Natureza em 2020, enquanto em 2023 a taxa caiu para 31,50%.
+    - Possível interpretação: A concentração das maiores taxas em 2020 indica uma forte alteração no comportamento de comparecimento nesse período.
+    - Limitação: Os dados analisados mostram a relação temporal, mas não permitem determinar sozinhos quais fatores causaram essa diferença.
+    - Hipótese para modelagem: H1: o ano da edição pode estar relacionado à probabilidade de ausência.
+
+2. O primeiro dia de prova apresentou maior ausência
+    - Achado: A taxa de ausência foi maior no 1º dia de prova do que no 2º dia em todos os anos analisados.
+    - Evidência: O padrão foi observado de forma consistente entre 2019 e 2023.
+    - Possível interpretação: O comparecimento pode variar de acordo com o dia de aplicação, indicando que o momento da prova pode estar relacionado à ausência.
+    - Limitação: A análise não permite identificar o motivo individual da ausência em cada dia.
+    - Hipótese para modelagem: H2: características relacionadas à aplicação da prova podem contribuir para identificar participantes com maior probabilidade de ausência.
+
+3. A renda apresentou relação com a ausência
+    - Achado: Participantes das menores faixas de renda apresentaram maiores taxas de ausência.
+    - Evidência: As taxas de ausência foram maiores nos grupos de menor renda familiar.
+    - Possível interpretação: A diferença pode estar relacionada a dificuldades socioeconômicas que afetam a possibilidade de comparecimento ao exame.
+    - Limitação: A associação observada não permite afirmar que a renda seja a causa da ausência.
+    - Hipótese para modelagem: H3: características socioeconômicas podem contribuir para a identificação de participantes ausentes.
+
+4. A idade apresentou diferenças relevantes
+    - Achado: A taxa de ausência variou entre as diferentes faixas etárias.
+    - Evidência: As maiores taxas observadas chegaram a 59,07% em faixas intermediárias.
+    - Possível interpretação: Diferentes momentos da trajetória escolar podem estar associados a diferentes padrões de comparecimento.
+    - Limitação: A análise não permite determinar por que determinadas faixas apresentam maior ausência.
+    - Hipótese para modelagem: H4: características relacionadas à idade podem contribuir para a identificação da ausência.
+
+5. Existem diferenças entre os estados
+    - Achado: A ausência não apresentou o mesmo comportamento em todas as unidades federativas.
+    - Evidência: O Amazonas apresentou taxa de ausência de 52,15%, destacando-se entre os estados analisados.
+    - Possível interpretação: Diferenças regionais podem estar relacionadas às características sociais, econômicas e de acesso ao local de aplicação.
+    - Limitação: A análise estadual não permite identificar quais fatores específicos explicam as diferenças observadas.
+    - Hipótese para modelagem: H5: características relacionadas à localização podem contribuir para a identificação de participantes ausentes.
+
+6. O tipo de escola apresentou diferenças de ausência
+    - Achado: As taxas de ausência variaram entre os grupos de tipo de escola.
+    - Evidência: Foram observadas taxas de 41,75%, 30,64% e 8,44% entre os grupos analisados.
+    - Possível interpretação: O contexto escolar pode estar relacionado às condições de participação no exame.
+    - Limitação: A diferença entre os grupos não permite afirmar que o tipo de escola seja diretamente responsável pela ausência.
+    - Hipótese para modelagem: H6: características relacionadas à escola podem contribuir para a identificação da ausência.
+
+7. Sexo apresentou pouca diferença
+    - Achado: As taxas de ausência entre homens e mulheres foram próximas.
+    - Evidência: Não foram observadas diferenças expressivas entre os dois grupos.
+    - Possível interpretação: O sexo, isoladamente, parece apresentar menor diferença na taxa de ausência quando comparado a outras características analisadas.
+    - Limitação: Uma variável isolada não permite avaliar possíveis interações com fatores socioeconômicos, escolares ou regionais.
+    - Hipótese para modelagem: H7: o sexo pode contribuir para o modelo quando analisado em conjunto com outras características.
+  
+### Síntese da Análise Exploratória
+
+Os resultados indicam que a ausência no ENEM não se distribui de maneira uniforme entre os participantes.
+
+Foram identificadas diferenças relacionadas principalmente a ano, renda, idade, localização e tipo de escola, enquanto as diferenças entre homens e mulheres foram menores.
+
+Esses achados ajudaram a direcionar a etapa de modelagem, na qual essas características foram utilizadas como variáveis preditoras para verificar se é possível identificar participantes com maior probabilidade de ausência.
 
 ### Script da análise
 
