@@ -132,27 +132,39 @@ Concentra os dados compilados e tratados que serão utilizados nas análises.
 | `requirements.txt`       | Dependências Python                           |
 | `.gitignore`             | Define arquivos que não devem ser versionados |
 
-## Tecnologias
 
-* **Python 3.11**
-* **Pandas**
-* **PostgreSQL**
-* **psycopg2**
-* **python-dotenv**
-* **DBeaver**
-* **SQL**
-* **Git / GitHub**
+### Tecnologias
+
+- **Python 3.11**
+- **PostgreSQL**
+- **DBeaver**
+- **Git / GitHub**
+- **SQL**
+
+### Bibliotecas Python
+
+As bibliotecas utilizadas no projeto estão centralizadas no arquivo `requirements.txt`:
+
+- **Pandas** — leitura, tratamento e análise dos dados;
+- **psycopg2** — conexão entre Python e PostgreSQL;
+- **python-dotenv** — carregamento das variáveis de ambiente do `.env`;
+- **scikit-learn** — preparação dos dados, divisão treino/teste e métricas dos modelos;
+- **XGBoost** — treinamento do modelo XGBoost;
+- **Matplotlib** — geração das visualizações;
+- **Seaborn** — geração das visualizações estatísticas.
 
 # Como executar
 
 ## 1. Pré-requisitos
 
-Instalou-se:
+Antes de executar o projeto, é necessário ter instalado:
 
-* Python 3.11 ou superior;
-* PostgreSQL;
-* DBeaver;
-* Git.
+- Python 3.11 ou superior;
+- PostgreSQL;
+- DBeaver;
+- Git.
+
+As bibliotecas Python são instaladas posteriormente pelo arquivo `requirements.txt`.
 
 ## 2. Baixar os microdados
 
