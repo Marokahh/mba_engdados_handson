@@ -4,3 +4,6 @@ psycopg2-binary
 python-dotenv
 pathlib
 SQLAlchemy
+scikit-learn
+xgboost
+seaborn
