@@ -37,15 +37,14 @@ from src.database import get_connection
 # ============================================================
 
 TABELA = "dw_enem.microdados_enem_tratado"
-
 TARGET = "TP_PRESENCA_CN"
 
 
 # ------------------------------------------------------------
-# Quantidade máxima de registros mantidos para o treinamento.
+# Quantidade de registros utilizados no treinamento.
 #
-# A base inteira será percorrida em blocos, mas não vamos
-# colocar os 21 milhões na memória ao mesmo tempo.
+# A base é lida em blocos para não colocar todos os
+# registros na memória ao mesmo tempo.
 # ------------------------------------------------------------
 
 MAX_REGISTROS_MODELO = 2_100_000
@@ -155,7 +154,7 @@ def main():
         )
 
         print(
-            f"Limite de registros mantidos na memória: "
+            f"Limite de registros utilizados: "
             f"{MAX_REGISTROS_MODELO:,}"
         )
 
@@ -173,11 +172,17 @@ def main():
         # Remove possíveis duplicações
         colunas_sql = list(dict.fromkeys(colunas_sql))
 
+        # ----------------------------------------------------
+        # ORDER BY garante que as mesmas linhas sejam
+        # selecionadas em todas as execuções.
+        # ----------------------------------------------------
+
         consulta = f"""
             SELECT
                 {", ".join(f'"{coluna}"' for coluna in colunas_sql)}
             FROM {TABELA}
-            WHERE "{TARGET}" IN (0, 1);
+            WHERE "{TARGET}" IN (0, 1)
+            ORDER BY "NU_INSCRICAO";
         """
 
         # ====================================================
@@ -189,8 +194,13 @@ def main():
         print("-" * 80)
 
         print(
-            "\nA base inteira será percorrida sem carregar "
-            "todos os registros na memória."
+            "\nA base será percorrida em blocos de "
+            f"{TAMANHO_CHUNK:,} registros."
+        )
+
+        print(
+            "Serão mantidos até "
+            f"{MAX_REGISTROS_MODELO:,} registros para o modelo."
         )
 
         chunks = []
@@ -212,7 +222,9 @@ def main():
             # Remove registros sem variável alvo
             # ----------------------------------------------
 
-            chunk = chunk.dropna(subset=[TARGET])
+            chunk = chunk.dropna(
+                subset=[TARGET]
+            )
 
             chunk[TARGET] = chunk[TARGET].astype("int8")
 
@@ -228,16 +240,15 @@ def main():
                 break
 
             # ----------------------------------------------
-            # Se o chunk ultrapassar o limite restante,
-            # selecionamos apenas uma parte dele.
+            # Caso o último chunk ultrapasse o limite,
+            # pega somente a quantidade necessária.
             # ----------------------------------------------
 
             if len(chunk) > quantidade_restante:
 
-                chunk = chunk.sample(
-                    n=quantidade_restante,
-                    random_state=42
-                )
+                chunk = chunk.iloc[
+                    :quantidade_restante
+                ].copy()
 
             chunks.append(chunk)
 
@@ -310,13 +321,17 @@ def main():
 
             if X[coluna].dtype == "object":
 
-                X[coluna] = X[coluna].fillna("MISSING")
+                X[coluna] = X[coluna].fillna(
+                    "MISSING"
+                )
 
             else:
 
                 X[coluna] = X[coluna].fillna(-1)
 
-        print("\nVariáveis categóricas sendo transformadas...")
+        print(
+            "\nVariáveis categóricas sendo transformadas..."
+        )
 
         X = pd.get_dummies(
             X,
@@ -344,8 +359,13 @@ def main():
             stratify=y
         )
 
-        print(f"\nTreino: {len(X_train):,}")
-        print(f"Teste : {len(X_test):,}")
+        print(
+            f"\nTreino: {len(X_train):,}"
+        )
+
+        print(
+            f"Teste : {len(X_test):,}"
+        )
 
         # ====================================================
         # 9. RANDOM FOREST
@@ -390,7 +410,9 @@ def main():
         print("REALIZANDO PREVISÕES")
         print("-" * 80)
 
-        y_pred = modelo.predict(X_test)
+        y_pred = modelo.predict(
+            X_test
+        )
 
         # ====================================================
         # 11. MÉTRICAS
@@ -589,6 +611,20 @@ def main():
 if __name__ == "__main__":
     main()
 
-# Random Forest V2: foi treinado utilizando aproximadamente 10% de registros da base tratada, com 80% dos dados destinados ao treinamento e 20% ao teste. A classe 1 representa os participantes ausentes.
-# Então a estrutura fica:
-# leitura em blocos de 100 mil -> percorre a base -> mantém até 2.1 milhões na RAM ->80% treino / 20% teste
+
+# Random Forest V2:
+# Foi treinado utilizando aproximadamente 10% dos registros
+# da base tratada.
+#
+# A leitura é feita em blocos de 100 mil registros.
+# A seleção é ordenada por NU_INSCRICAO para garantir
+# que o mesmo conjunto de 2,1 milhões seja utilizado
+# em todas as execuções.
+#
+# Depois:
+#
+# 2.100.000 registros selecionados
+#          ↓
+# 80% treino / 20% teste
+#          ↓
+# Random Forest V2

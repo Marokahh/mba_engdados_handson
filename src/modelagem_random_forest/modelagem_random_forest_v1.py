@@ -141,6 +141,7 @@ def main():
                 {", ".join(f'"{coluna}"' for coluna in colunas_sql)}
             FROM {TABELA}
             WHERE "{TARGET}" IN (0, 1)
+            ORDER BY "NU_INSCRICAO"
             LIMIT {TAMANHO_AMOSTRA};
         """
 
