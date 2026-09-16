@@ -462,12 +462,105 @@ python src/analise_exploratoria.py
 ```
 
 ## Visualizações em gráficos
+<img width="893" height="489" alt="image" src="https://github.com/user-attachments/assets/776e2c3c-1753-457b-9676-e14ff145887e" />
+<img width="941" height="536" alt="image" src="https://github.com/user-attachments/assets/6415bdbc-20b7-43ba-ad29-e02de985ae5c" />
+<img width="641" height="490" alt="image" src="https://github.com/user-attachments/assets/7c615cbc-3b3f-4cf4-a240-4245c3b59172" />
+<img width="989" height="837" alt="image" src="https://github.com/user-attachments/assets/334dd98e-6da5-4825-b476-a70db29703a7" />
+<img width="990" height="540" alt="image" src="https://github.com/user-attachments/assets/1244751f-00cc-43b0-a5d8-cfcf2a790ef5" />
+<img width="1191" height="886" alt="image" src="https://github.com/user-attachments/assets/5ab385bb-b5d4-474a-a491-295d17ce56ca" />
+<img width="988" height="987" alt="image" src="https://github.com/user-attachments/assets/837cd3fc-4ad8-4663-946f-002c4b581852" />
+<img width="738" height="486" alt="image" src="https://github.com/user-attachments/assets/ba98d425-2ba3-4d9c-8dd8-b61febdf5b8f" />
 
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
-![alt text](image-3.png)
-![alt text](image-4.png)
-![alt text](image-5.png)
-![alt text](image-6.png)
-![alt text](image-7.png)
+# Modelagem - Etapa 3
+
+## 1. Objetivo da modelagem
+
+Nesta etapa, o objetivo foi desenvolver modelos capazes de identificar participantes que não compareceram ao ENEM.
+
+A variável utilizada como alvo foi `TP_PRESENCA_CN`, considerando:
+
+- `0 = Presente`
+- `1 = Ausente`
+
+A classe de maior interesse é **Ausente**, pois a proposta do projeto é identificar padrões relacionados à ausência dos participantes.
+
+## 2. Estratégia de modelagem
+Foram utilizados três tipos de abordagem:
+- **Baseline:** modelo de referência, que sempre prevê a classe mais frequente.
+- **Random Forest:** modelo baseado em várias árvores de decisão, utilizado para identificar relações entre as características dos participantes e a ausência.
+- **XGBoost:** modelo de árvores com treinamento sequencial, utilizado como segunda abordagem de Machine Learning.
+
+Foram desenvolvidas duas versões dos modelos de Machine Learning:
+- **V1:** amostra de 200.000 registros.
+- **V2:** amostra de 2.100.000 registros, aproximadamente 10% da base.
+
+A divisão dos dados foi feita em:
+- 80% para treinamento;
+- 20% para teste;
+- divisão estratificada;
+- `random_state = 42`.
+
+As variáveis utilizadas foram:
+- `TP_SEXO`
+- `TP_COR_RACA`
+- `TP_ESTADO_CIVIL`
+- `TP_NACIONALIDADE`
+- `TP_ESCOLA`
+- `TP_ENSINO`
+- `IN_TREINEIRO`
+- `TP_ST_CONCLUSAO`
+- `TP_ANO_CONCLUIU`
+- `TP_LOCALIZACAO_ESC`
+- `TP_DEPENDENCIA_ADM_ESC`
+- `TP_SIT_FUNC_ESC`
+
+
+## 3. Decisões tomadas
+
+* Uso do Baseline: O Baseline foi utilizado como referência para verificar o quanto os modelos de Machine Learning conseguem avançar em relação a uma estratégia simples de previsão.
+* Uso de duas amostras: A V1 utiliza 200.000 registros para permitir uma primeira avaliação dos modelos com menor custo computacional.
+* Na V2, a amostra foi aumentada para 2.100.000 registros para verificar se o aumento da quantidade de dados produziria uma melhora relevante no desempenho.
+* Foco na classe Ausente.
+* Como o objetivo do projeto é identificar participantes ausentes, foram analisadas principalmente as métricas:
+    - **Precision:** entre as previsões de ausência, quantas realmente eram ausentes;
+    - **Recall:** entre os participantes realmente ausentes, quantos foram identificados;
+    - **F1-score:** equilíbrio entre Precision e Recall;
+    - **Balanced Accuracy:** desempenho considerando as duas classes.
+
+## 4. Resultados
+
+| Modelo | Registros | Accuracy | Precision | Recall | F1-score | Balanced Accuracy |
+|---|---:|---:|---:|---:|---:|---:|
+| Baseline | 21.669.596 | 62,77% | 0,00% | 0,00% | 0,00% | 50,00% |
+| Random Forest V1 | 200.000 | 63,50% | 85,31% | 63,61% | 72,88% | 63,36% |
+| Random Forest V2 | 2.100.000 | 62,56% | 84,85% | 61,54% | 71,34% | 63,63% |
+| XGBoost V1 | 200.000 | 63,41% | 85,73% | 63,04% | 72,65% | 63,86% |
+| XGBoost V2 | 2.100.000 | 62,39% | 84,97% | 61,15% | 71,12% | 63,70% |
+
+> As métricas de Precision, Recall e F1-score consideram **Ausente como classe positiva (`1`)**.
+
+
+## 5. Insights dos resultados
+
+Os resultados mostram que os modelos de Machine Learning apresentaram desempenho superior ao Baseline principalmente na capacidade de identificar a classe **Ausente**.
+
+O Baseline apresenta Accuracy de **62,77%**, porém não identifica os participantes ausentes. Isso acontece porque sua estratégia consiste em sempre prever a classe mais frequente.
+
+Nos modelos de Machine Learning, o **Recall da classe Ausente ficou próximo de 61% a 64%**, indicando que uma parcela relevante dos participantes que realmente estavam ausentes foi identificada pelo modelo.
+
+Outro ponto observado é que o aumento da amostra de **200 mil para 2,1 milhões de registros não trouxe ganho direto de Accuracy, Recall ou F1-score**. Tanto Random Forest quanto XGBoost apresentaram resultados ligeiramente menores na V2 nessas métricas.
+
+Por outro lado, a **Balanced Accuracy permaneceu próxima de 64% nas quatro versões**, indicando que o desempenho entre as classes ficou relativamente estável mesmo com o aumento da quantidade de dados.
+
+
+## 6. Conclusão
+
+A modelagem mostrou que as características disponíveis dos participantes possuem capacidade de contribuir para a identificação de ausências no ENEM.
+
+Os modelos de Random Forest e XGBoost conseguiram identificar participantes ausentes, apresentando Recall acima de 60%, enquanto o Baseline não identifica essa classe.
+
+O aumento da quantidade de dados utilizado na V2 não resultou em uma melhora direta nas principais métricas. Esse resultado indica que, para as variáveis utilizadas nesta etapa, aumentar a quantidade de registros por si só não foi suficiente para melhorar o desempenho.
+
+A partir desses resultados, novas etapas podem explorar outras variáveis e ajustes dos modelos para buscar uma melhor identificação dos participantes ausentes.
+
+
